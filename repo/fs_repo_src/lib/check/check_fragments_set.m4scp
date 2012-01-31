@@ -1,0 +1,106 @@
+
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: check_fragments_set.m4scp
+// Description:
+// Файл содержит процедуру проверки множества атомарных
+// фрагментов заключения ипмликации
+// для попытки перенесения их в посылку высказывания 
+// 1-й аргумент - множество атомарных фрагментов
+// 2-й аргумент - множество связанных переменных 
+// фрагмента и посылки высказывания
+// 3-й аргумент - логический результат работы (истина/ложь)
+/////////////////////////////////////////////////////
+// 		Author: Daniil Shunkevich
+//        Date: 22.06.11
+
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "lib_set.scsy"
+#include "lib_search.scsy"
+#include "lib_check.scsy"
+
+procedure(check_fragments_set,
+[[
+	
+]],
+[{	
+	arc,arc1,linked,node,seg,segments,bool_res,linked,set_arc,temp,contour_set,set,check_res
+}],
+{[
+	1_: in_: left,
+	2_: in_: contour_set,
+	3_: out_: bool_res
+]}
+)
+
+sys_get_location([1_: contour_set,2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+
+searchSetStr3([
+	1_: fixed_: contour_set,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: temp,
+	set3_: assign_: set
+],,gen_bad_result)
+
+label(next_node)
+ifVarAssign([1_: set_arc],,noerase_setarc)
+eraseEl([1_: set_arc])
+label(noerase_setarc)
+searchElStr3([
+	1_: fixed_: set,
+	2_: assign_: const_: pos_: set_arc,
+	3_: assign_: const_: node_: node
+],,gen_bad_result)
+
+callReturn([1_: fixed_: search_linked_nodes,
+	    2_: fixed_:
+		{[
+			1_: fixed_: left,
+			2_: fixed_: conj_elem,
+			3_: assign_: linked 
+		]}
+])
+ifVarAssign([1_: linked],,next_node)
+callReturn([
+	1_: fixed_: check_fragment,
+	2_: fixed_:
+		{[
+			1_: fixed_: node,
+			2_: fixed_: linked,
+			3_: assign_: check_res
+		]}
+])
+eraseEl([1_: fixed_: linked])
+ifVarAssign([1_: check_res],,next_node)
+eraseEl([1_: fixed_: f_: check_res])
+
+label(gen_good_result)
+genEl([1_: assign_: const_: node_: bool_res],exit,exit)
+label(gen_bad_result)
+label(exit)
+return()
+end

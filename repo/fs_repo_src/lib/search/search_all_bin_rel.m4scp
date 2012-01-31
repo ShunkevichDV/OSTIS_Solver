@@ -1,0 +1,104 @@
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2011 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+//----------------------------------------------------------------------
+// File: search_all_bin_rel.m4scp
+// Description: Файл содержит процедуру поиска всех конструкций заданного вида
+//		relation
+//			|
+//			|
+//			v
+//		A <======== B
+//хранится в переменной result
+//----------------------------------------------------------------------
+// Author: Kharkunov Eugene
+// Date: 14.11.11
+
+#include "scp_keynodes.scsy"
+#include "ordinal.scsy"
+
+procedure(search_all_bin_rel,
+[[
+	pattern = [
+		_rel_arc = (_relation ->> _tmp_rel);
+		_con_a1 = (_tmp_rel ->> _elem);
+		_con_a2 = (_tmp_rel ->> _node);
+		_attr_a1 = (1_ ->> _con_a1);
+		_attr_a2 = (2_ ->> _con_a2);
+	];
+]],
+[{
+	//input parameters
+	element, relation, result,
+	//other
+	segment, t_seg, _a, _arc, conn
+}],
+{[
+	1_: in_: element,
+	2_: in_: relation,
+	3_: in_: result
+]})
+
+sys_get_location([1_: fixed_: element, 2_: assign_: segment])
+sys_spin_segment([1_: fixed_: segment, 2_: assign_: t_seg])
+
+/* need to set segment that contains result node as default to generate answer in it */
+sys_get_location([1_: fixed_: result, 2_: assign_: segment])
+sys_open_segment([1_: fixed_: segment])
+sys_set_default_segment([1_: fixed_: segment])
+
+//находим все связки отношения для указанного элемента и добавляем их в множество
+sys_search([
+	1_: pattern,
+	3_: fixed_: {
+		{1_: _relation, 2_: relation},
+		{1_: _elem, 2_: element}
+	},
+	4_: fixed_: result
+], , finish)
+
+//добавляем в результат узел отношения
+genElStr3([
+	1_: fixed_: result,
+	2_: assign_: const_: pos_: arc_: _a,
+	3_: fixed_: relation
+])
+
+//добавляет в результат узел 1_
+genElStr3([
+	1_: fixed_: result,
+	2_: assign_: const_: pos_: arc_: _a,
+	3_: fixed_: 1_
+])
+
+//добавляет в результат узел 2_
+genElStr3([
+	1_: fixed_: result,
+	2_: assign_: const_: pos_: arc_: _a,
+	3_: fixed_: 2_
+])
+
+label(finish)
+
+return()
+
+end

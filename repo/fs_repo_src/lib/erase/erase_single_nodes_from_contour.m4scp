@@ -1,0 +1,122 @@
+
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+// ///////////////////////////////////////////////////
+//        File: erase_single_nodes_from_contour.m4scp
+// Description:
+// This file contains procedure to destroy single nodes (without arcs)
+// from contour
+// 1st parameter - contour
+// ///////////////////////////////////////////////////
+// 		Author: Sergei Zalivako
+//        Date: 15.06.11
+
+#include "scp_keynodes.scsy"
+
+procedure(erase,
+[[	
+]],
+[{	
+	contour, nodes, 
+	arcFromContour, nodeVar, arcVar, attributeArc,
+	currentNode, arcsToCurrentNode, currentArc
+}],
+{[
+	1_: in_: contour
+]}
+)
+
+// »щем все узлы, которые вход€т в контур
+searchSetStr3([
+	1_: fixed_: contour,
+	2_: assign_: pos_: const_: arc_: arcFromContour,
+	3_: assign_: var_: node_: nodeVar,
+	set3_: assign_: const_: node_: nodes
+], , exit)
+
+// ѕросмотр всех найденных узлов
+label(nodesView)
+	
+	// Ќаходим очередной узел из контура
+	searchElStr3([
+		1_: fixed_: nodes,
+		2_: assign_: pos_: const_: arc_: arcVar,
+		3_: assign_: node_: currentNode
+	], , exit)
+	
+	// ”дал€ем дугу из множества найденных узлов к текущему узлу
+	eraseEl([
+		1_: fixed_: f_: arcVar
+	])
+	
+	// Ќаходим все дуги, которые идут от контура к очередному узлу
+	searchSetStr3([
+		1_: fixed_: contour,
+		2_: assign_: const_: pos_: arc_: arcVar,
+		3_: fixed_: currentNode,
+		set2_: assign_: const_: node_: arcsToCurrentNode
+	])
+	
+	// ѕросмотр найденных дуг
+	label(arcsView)
+		
+		// Ќаходим дугу из контура в очередной узел
+		searchElStr3([
+			1_: fixed_: arcsToCurrentNode,
+			2_: assign_: const_: pos_: arc_: arcVar,
+			3_: assign_: const_: pos_: arc_: currentArc
+		], , nodesView)
+		
+		// ”дал€ем принадлежность найденной дуги к множеству дуг из очередного узла
+		eraseEl([
+			1_: fixed_: f_: arcVar
+		])
+		
+		// »щем дуги, выход€щие из найденного узла в контуре
+		searchElStr5([
+			1_: fixed_: currentNode,
+			2_: assign_: arc_: arcVar,
+			3_: assign_: node_: nodeVar,
+			4_: assign_: const_: pos_: arc_: attributeArc,
+			5_: fixed_: contour
+		], arcsView)
+	
+		// »щем дуги, вход€щие в найденный узел в контуре
+		searchElStr5([
+			1_: assign_: node_: nodeVar,
+			2_: assign_: arc_: arcVar,
+			3_: fixed_: currentNode,
+			4_: assign_: const_: pos_: arc_: attributeArc,
+			5_: fixed_: contour
+		], arcsView)
+		
+		// ”дал€ем найденную дугу, т.к. узел €вл€етс€ одиночным
+		eraseEl([
+			1_: fixed_: f_: currentArc
+		], arcsView, arcsView)
+	
+// ¬ыход из процедуры в случае окончани€ перебора или отсутстви€ узлов в контуре
+label(exit)
+
+return()
+end

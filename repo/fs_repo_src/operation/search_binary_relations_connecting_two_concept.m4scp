@@ -1,0 +1,488 @@
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2011 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+//----------------------------------------------------------------------
+//        File: search_binary_relations_connecting_two_concept.m4scp
+// Description: Операция поиска всех бинарных отношений, связывающих два понятия
+//----------------------------------------------------------------------
+//              Author: Anton Svitenkov	
+//        Date: 25.11.11
+
+
+#include "scp_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "etc_questions_geometry.scsy"
+#include "com_keynodes.scsy"
+#include "_keynodes.scsy"
+#include "lib_answer.scsy"
+#include "lib_search.scsy"
+#include "meta_info.scsy"
+
+//программа инициализации операции
+program(init_op,
+[[
+	// 	ключевой узел инициированный вопрос
+	q_initiated;
+	// множество элементов для которых будут отслеживаться события
+	set_of_traced_element = {1_: q_initiated };
+	run_op;
+	catch_output_arc;
+	answer_make;
+	]],
+[{
+}])
+
+sys_set_event_handler([
+	1_: fixed_: catch_output_arc,
+	2_: fixed_: run_op,
+	3_: fixed_: {1_: q_initiated}
+	])
+return()
+end()
+
+//процедура обработки вопроса и генерации ответа
+procedure(run_op,
+[[
+		search_binary_relations_connecting_two_concept_search_procedure;
+		q_search_binary_relations_connecting_two_concept;
+		stype_bin_orient_norole_rel;	
+]],
+[{
+        // input params
+        descr, question_node,element,arc,
+        segment,t_seg, questionSet,
+        descr2,tArc1,tAcr2,tNode1,tNode2, result, cur_el
+}],
+{[
+        1_: in_: descr,
+        2_: in_: element,
+        3_: in_: arc,
+        4_: in_: question_node
+]}
+)
+
+printNl([1_: fixed_: /"checking: Op_search_binary_relations_connecting_two_concept"/])
+
+sys_get_location([1_: fixed_: question_node, 2_: assign_: segment])
+sys_spin_segment([1_: fixed_: segment, 2_: assign_: t_seg])
+//#sys_open_segment([1_: fixed_: segment])
+sys_set_default_segment([1_: fixed_: segment])
+
+printEl([1_: question_node])
+
+searchElStr3([
+	1_: fixed_: q_search_binary_relations_connecting_two_concept,
+	2_: assign_: arc_: const_: pos_: tArc1,
+	3_: fixed_: question_node
+], ,finish_op,runtime_error)
+
+
+// копируем все узлы из question_node
+searchSetStr3([
+                 1_:  fixed_: question_node,
+                 2_: assign_: const_: pos_: arc,
+                 3_: assign_: tNode1,
+                 set3_: assign_: questionSet
+    ], , ,runtime_error)
+	
+genEl([1_: assign_: const_: node_: result])
+callReturn([
+        1_: fixed_: search_binary_relations_connecting_two_concept_search_procedure,
+        2_: fixed_: {[
+                1_: fixed_: question_node,
+                //#2_: search_binary_relations_connecting_two_concept_search_procedure,
+                2_: assign_: result
+                ]}
+        ], , , runtime_error)
+
+
+//удаляем из ответа узлы вопроса
+// цикл по узлам вопроса
+label(delete_question_nodes_from_result_begin)
+    searchElStr3([
+        1_:  fixed_: questionSet,
+        2_: assign_: tArc1,
+        3_: assign_: cur_el
+    ],,delete_question_nodes_from_result_end, runtime_error)
+
+    eraseEl([1_: fixed_: f_: tArc1])
+    
+    searchElStr3([
+        1_:  fixed_: result,
+        2_: assign_: tArc1,
+        3_: fixed_: cur_el
+    ],,delete_question_nodes_from_result_begin, runtime_error)
+    
+    eraseEl([1_: f_: tArc1])  
+
+nop(delete_question_nodes_from_result_begin)
+label(delete_question_nodes_from_result_end)
+
+label(make_answer_end)
+
+printNl([1_: /"RESULT"/])
+printEl([1_: result])
+// добавляем результаты в ответ
+	callReturn([
+		1_: fixed_: answer_make,
+		2_: fixed_: {[
+			1_: question_node,
+			2_: result
+		]}
+],finish_op,,runtime_error)
+
+label(finish_op)
+return()
+
+// сообщение об ошибке во время выполнения
+label(runtime_error)
+printNl([1_: fixed_: /"\nOp_search_binary_relations_connecting_two_concept\nruntime_error"/])
+return()
+end()
+
+procedure(search_binary_relations_connecting_two_concept_search_procedure,
+[[
+	stype_bin_orient_norole_rel;
+	search_var_and_add_to_answer_procedure;
+]],
+[{
+	segment,t_seg,
+	tNode1,tNode2,tArc1,tArc2,firstNode,secondNode,tempSet1,tempSet2,
+	question_node, result,curEl, tArc3, relNode, tempRelSet, tSetArc1, tSetArc2
+}],
+{[
+	1_: in_: question_node,
+	2_: in_: result
+]})
+
+
+sys_get_location([1_: fixed_: question_node, 2_: assign_: segment])
+sys_spin_segment([1_: fixed_: segment, 2_: assign_: t_seg])
+//#sys_open_segment([1_: fixed_: segment])
+sys_set_default_segment([1_: fixed_: segment])
+
+printNl([1_: /"QUESTNODE"/])
+printEl([1_: question_node])
+
+// проверка: в множестве должно быть ровно 2 узла
+// находим первый узел
+searchElStr3([
+	1_: fixed_: question_node,
+	2_: assign_: arc_: const_: pos_: tArc1,
+	3_: assign_: firstNode
+], ,finish_procedure,runtime_error)
+eraseEl([1_: f_: tArc1])
+
+// находим второй узел
+searchElStr3([
+	1_: fixed_: question_node,
+	2_: assign_: arc_: const_: pos_: tArc1,
+	3_: assign_: secondNode
+], ,finish_procedure,runtime_error)
+eraseEl([1_: f_: tArc1])
+label(in_answer_not_question_node)
+
+
+// проверяем, пустое ли множество. если нет - то заветшаем работу
+searchElStr3([
+	1_: fixed_: question_node,
+	2_: assign_: arc_: const_: pos_: tArc1,
+	3_: assign_: tNode1
+], finish_procedure,,runtime_error)
+
+
+// находим множество пятёрок в которых firstNode стоит с атрибутом
+searchSetStr5([
+                 1_: assign_: const_: tNode1,
+                 2_: assign_: const_: pos_: tArc1,
+                 3_:  fixed_: node_ : firstNode,
+                 4_: assign_: const_: pos_: tArc2,
+                 5_: assign_: const_: tNode2,
+                 set1_: assign_: tempSet1
+],,, runtime_error)
+
+// цикл по множеству tempSet1
+label([cycle_on_tempSet1_beg])
+    searchElStr3([
+        1_:  fixed_: tempSet1,
+        2_: assign_: tArc1,
+        3_: assign_: curEl
+    ],, cycle_on_tempSet1_end,runtime_error)
+    eraseEl([1_: fixed_:  tArc1])
+    
+    // проверяем, есть ли дуга из curEl в secondNode
+    // если нет, то заверщаем текущую итерацию
+    searchElStr3([
+        1_:  fixed_: curEl,
+        2_: assign_: tArc1,
+        3_:  fixed_: secondNode 
+    ],, cycle_on_tempSet1_beg,runtime_error)
+    
+    // дуга найдена
+    
+    
+    // проверяем, является ли curEl узел отношением
+    // для этого находим все входящие в узел связки curEl дуги от узлов, и проверяем, является ли узел отношением
+	
+	    
+    searchSetStr3([
+                 1_: assign_: const_: tNode1,
+                 2_: assign_: const_: pos_: tArc1,
+                 3_: fixed_: node_ : curEl,
+                 set1_: assign_: tempRelSet
+               ],,,runtime_error)
+               
+               
+   	
+    selectYStr3([
+                 1_: fixed_: stype_bin_orient_norole_rel,
+                 2_: assign_: const_: pos_: tArc1,
+                 3_: assign_: node_ : tNode1,
+                 set3_: fixed_: tempRelSet
+    ],,cycle_on_tempSet1_beg,runtime_error)
+    
+    
+   	searchElStr3([
+        1_:  fixed_: tempRelSet,
+        2_: assign_: tArc1,
+        3_: assign_: relNode 
+    ],, cycle_on_tempSet1_beg,runtime_error)
+   	    
+    // этот узел является связкой в узле отношения
+    // необходимо найти все дуги и добавить их в ответ
+    // запускаем процедуру поиска и добавления
+    callReturn([
+    	1_: search_var_and_add_to_answer_procedure,
+   		2_: {[
+        	1_: curEl,
+        	2_: relNode,
+        	3_: firstNode,
+        	4_: secondNode,
+        	5_: result
+    	]}
+	],,runtime_error, runtime_error)
+
+nop(cycle_on_tempSet1_beg)
+label(cycle_on_tempSet1_end)
+
+
+label(finish_procedure)
+return()
+
+label(runtime_error)
+// сообщение об ошибке во время выполнения
+printNl([1_: fixed_: /"\nOp_search_binary_relations_connecting_two_concept\nruntime_error"/])
+return()
+end()
+
+procedure(search_var_and_add_to_answer_procedure,
+[[
+]],
+[{
+	segment, t_seg,
+	sheafNode, relationNode, firstNode, secondNode, resultSet,tArc1,
+	fAttr1, fAttr2, fArc1, fArc2, fArc3, fArc4, fArc5 
+}],
+{[
+	1_: in_: sheafNode,
+	2_: in_: relationNode,
+	3_: in_: firstNode,
+	4_: in_: secondNode,
+	5_: in_: resultSet
+	
+]})
+
+
+//#sys_get_location([1_: fixed_: question_node, 2_: assign_: segment])
+//#sys_spin_segment([1_: fixed_: segment, 2_: assign_: t_seg])
+//#sys_open_segment([1_: fixed_: segment])
+//#sys_set_default_segment([1_: fixed_: segment])
+
+// находим дуги 
+// находим дуги с атрибутом к firstNode
+searchElStr5([
+    	1_:  fixed_: sheafNode,
+   	 	2_: assign_: arc_: pos_: const_: fArc1,
+    	3_:  fixed_: firstNode,
+    	4_: assign_: arc_: pos_: const_: fArc2,
+    	5_: assign_: fAttr1
+	],,finish_procedure,runtime_error)
+	
+// находим дуги с атрибутом к secondNode
+searchElStr5([
+    	1_:  fixed_: sheafNode,
+   	 	2_: assign_: arc_: pos_: const_: fArc3,
+    	3_:  fixed_: secondNode,
+    	4_: assign_: arc_: pos_: const_: fArc4,
+    	5_: assign_: fAttr2
+	],,finish_procedure,runtime_error)
+
+// ищем дугу из отношения в узел разбиения
+searchElStr3([
+        1_:  fixed_: relationNode,
+        2_: assign_: fArc5,
+        3_:  fixed_: sheafNode
+    ],,finish_procedure,runtime_error)
+
+// все недостающие элементы найдены нужно добавлять их в ответ
+// но необходимо проверять, может они уже содержаться в ответе
+searchElStr3([
+        1_:  fixed_: resultSet,
+        2_: assign_: tArc1,
+        3_:  fixed_: sheafNode
+    ],add_relationNode,,runtime_error)
+genElStr3([
+    1_:  fixed_: resultSet,
+    2_: assign_: arc_: pos_: const_: tArc1,
+    3_:  fixed_: sheafNode
+])
+
+
+label(add_relationNode)
+searchElStr3([
+        1_:  fixed_: resultSet,
+        2_: assign_: tArc1,
+        3_:  fixed_: relationNode
+    ],add_firstNode,,runtime_error)
+genElStr3([
+    1_:  fixed_: resultSet,
+    2_: assign_: arc_: pos_: const_: tArc1,
+    3_:  fixed_: relationNode
+])
+
+label(add_firstNode)
+searchElStr3([
+        1_:  fixed_: resultSet,
+        2_: assign_: tArc1,
+        3_:  fixed_: firstNode
+    ],add_secondNode,,runtime_error)
+genElStr3([
+    1_:  fixed_: resultSet,
+    2_: assign_: arc_: pos_: const_: tArc1,
+    3_:  fixed_: firstNode
+])
+
+label(add_secondNode)
+searchElStr3([
+        1_:  fixed_: resultSet,
+        2_: assign_: tArc1,
+        3_:  fixed_: secondNod
+    ],add_fAttr1,,runtime_error)
+genElStr3([
+    1_:  fixed_: resultSet,
+    2_: assign_: arc_: pos_: const_: tArc1,
+    3_:  fixed_: secondNode
+])
+
+label(add_fAttr1)
+searchElStr3([
+        1_:  fixed_: resultSet,
+        2_: assign_: tArc1,
+        3_:  fixed_: fAttr1
+    ],add_fAttr2,,runtime_error)
+genElStr3([
+    1_:  fixed_: resultSet,
+    2_: assign_: arc_: pos_: const_: tArc1,
+    3_:  fixed_: fAttr1
+])
+
+label(add_fAttr2)
+searchElStr3([
+        1_:  fixed_: resultSet,
+        2_: assign_: tArc1,
+        3_:  fixed_: fAttr2
+    ],add_fArc1,,runtime_error)
+genElStr3([
+    1_:  fixed_: resultSet,
+    2_: assign_: arc_: pos_: const_: tArc1,
+    3_:  fixed_: fAttr2
+])
+
+label(add_fArc1)
+searchElStr3([
+        1_:  fixed_: resultSet,
+        2_: assign_: tArc1,
+        3_:  fixed_: fArc1
+    ],add_fArc2,,runtime_error)
+genElStr3([
+    1_:  fixed_: resultSet,
+    2_: assign_: arc_: pos_: const_: tArc1,
+    3_:  fixed_: fArc1
+])
+
+label(add_fArc2)
+searchElStr3([
+        1_:  fixed_: resultSet,
+        2_: assign_: tArc1,
+        3_:  fixed_: fArc2
+    ],add_fArc3,,runtime_error)
+genElStr3([
+    1_:  fixed_: resultSet,
+    2_: assign_: arc_: pos_: const_: tArc1,
+    3_:  fixed_: fArc2
+])
+
+label(add_fArc3)
+searchElStr3([
+        1_:  fixed_: resultSet,
+        2_: assign_: tArc1,
+        3_:  fixed_: fArc3
+    ],add_fArc4,,runtime_error)
+genElStr3([
+    1_:  fixed_: resultSet,
+    2_: assign_: arc_: pos_: const_: tArc1,
+    3_:  fixed_: fArc3
+])
+
+label(add_fArc4)
+searchElStr3([
+        1_:  fixed_: resultSet,
+        2_: assign_: tArc1,
+        3_:  fixed_: fArc4
+    ],add_fArc5,,runtime_error)
+genElStr3([
+    1_:  fixed_: resultSet,
+    2_: assign_: arc_: pos_: const_: tArc1,
+    3_:  fixed_: fArc4
+])
+
+label(add_fArc5)
+searchElStr3([
+        1_:  fixed_: resultSet,
+        2_: assign_: tArc1,
+        3_:  fixed_: fArc5
+    ],end_add_label,,runtime_error)
+genElStr3([
+    1_:  fixed_: resultSet,
+    2_: assign_: arc_: pos_: const_: tArc1,
+    3_:  fixed_: fArc5
+])
+
+
+label(end_add_label)
+
+label(finish_procedure)
+return()
+
+label(runtime_error)
+printNl([1_: fixed_: /"\nOp_search_binary_relations_connecting_two_concept search_var_and_add_to_answer_procedure  \nruntime_error"/])
+end

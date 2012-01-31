@@ -1,0 +1,19 @@
+//#sss
+#include "scp_keynodes.scsy"
+
+program(enable_arifmetic_processor,
+[[	
+]],
+[{
+}],
+{[
+]}
+)
+callReturn([1_: fixed_: "/operation/arifmetic_operations/addition/init_op", 2_: fixed_: {[]}])
+callReturn([1_: fixed_: "/operation/arifmetic_operations/multiplication/init_op", 2_: fixed_: {[]}])
+callReturn([1_: fixed_: "/operation/arifmetic_operations/calculation/init_op", 2_: fixed_: {[]}])
+callReturn([1_: fixed_: "/operation/arifmetic_operations/exponention/init_op", 2_: fixed_: {[]}])
+callReturn([1_: fixed_: "/operation/arifmetic_operations/greater/init_op", 2_: fixed_: {[]}])
+callReturn([1_: fixed_: "/operation/arifmetic_operations/equals/init_op", 2_: fixed_: {[]}])
+return()
+end

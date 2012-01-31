@@ -1,0 +1,130 @@
+
+/*-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2011 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modfirst_ely
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  first_el not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: callArifmeticOperation.m4scp
+// Description: Файл содержит процедуру для инициирования арифметической операции
+/////////////////////////////////////////////////////
+// 		Author: Sergei Zalivako
+//        Date: 28.03.2011 
+
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "lib_set.scsy"
+#include "lib_search.scsy"
+#include "lib_answer.scsy"
+#include "lib_set.scsy"
+#include "lib_other.scsy"
+#include "meta_info.scsy"
+
+
+procedure(run,
+[[
+	// Ключевой узел, обозначающий инициированный вопрос
+	q_initiated;
+	
+	// Ключевой узел, обозначающий вопрос
+	question;
+	
+	// Атрибут того, что операция выполнилась
+	rrel_operation_is_over;
+	
+	// Атрибут присутствия ответа
+	rrel_answer_is_present;
+]],
+[{
+	q_arifmetic, arcVar, questionNode, arifmeticLink,
+	isSuccess, arc, attributeArc
+}],
+{[
+	1_: in_: q_arifmetic, 
+	2_: in_: arifmeticLink, 
+	3_: out_: isSuccess
+]}
+)
+
+// Инициируем выполнение арифметической операции
+// Проводим дугу из запроса заданной арифметической операции
+genElStr3([
+	1_: fixed_: q_arifmetic,
+	2_: assign_: arc_: const_: pos_: actual_: arcVar,
+	3_: assign_: const_: node_: questionNode
+])
+		
+// Генерируем дугу из вопроса к связке отношения арифметической операции
+genElStr3([
+	1_: fixed_: questionNode,
+	2_: assign_: arc_: const_: pos_: actual_: arcVar,
+	3_: fixed_: arifmeticLink
+])
+		
+// Проводим дугу из узла "вопрос"
+genElStr3([
+	1_: fixed_: question,
+	2_: assign_: arc_: const_: pos_: actual_: arcVar,
+	3_: fixed_: questionNode
+])
+		
+// Проводим дугу из узла "инициированный вопрос"
+genElStr3([
+	1_: fixed_: q_initiated,
+	2_: assign_: arc_: const_: pos_: actual_: arcVar,
+	3_: fixed_: questionNode
+])
+		
+// Ждем пока инициированная операция завершиться
+label(waitingForOperation)
+	sys_wait([
+		1_: fixed_: catch_output_arc,
+		2_: fixed_: {1_: rrel_operation_is_over}
+	])
+	
+	// Проверяем, что завершилась именно инициированная операция
+	searchElStr5([
+		1_: fixed_: q_arifmetic,
+		2_: assign_: arc_: const_: pos_: actual_: arc,
+		3_: fixed_: questionNode,
+		4_: assign_: arc_: const_: pos_: actual_: attributeArc,
+		5_: fixed_: rrel_operation_is_over
+	], , waitingForOperation)
+	
+	// Ищем атрибут успешного завершения операции
+	// Если он найлен, то создаем признак того, что операция завершилась успешно
+	searchElStr5([
+		1_: fixed_: q_arifmetic,
+		2_: assign_: arc_: const_: pos_: actual_: arc,
+		3_: fixed_: questionNode,
+		4_: assign_: arc_: const_: pos_: actual_: attributeArc,
+		5_: fixed_: rrel_answer_is_present
+	], , exit)
+
+	// Генерируем признак успешного завершения операции	
+	genEl([
+		1_: assign_: node_: const_: isSuccess
+	])
+				
+label(exit)
+			
+return()
+	
+end

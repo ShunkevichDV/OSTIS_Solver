@@ -1,0 +1,38 @@
+//#sss
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+
+program(logictemp,
+[[	
+	link="/seb/planimetry/A_and_B_question";	
+	req=q_initiated;
+	here=/"\n\nLOGIC ended!\n\n"/;
+]],
+[{
+	arc,descr,temp
+}],
+{[
+]}
+)
+genElStr3([
+	1_: fixed_: q_validity,
+	2_: assign_: arc,
+	3_: assign_: const_: node_: temp
+])
+genElStr3([
+	1_: fixed_: temp,
+	2_: assign_: arc,
+	3_: fixed_: link
+])
+
+genElStr3([
+	1_: fixed_: req,
+	2_: assign_: arc,
+	3_: fixed_: temp
+])
+
+printNl([1_: here])
+
+return()
+end

@@ -1,0 +1,83 @@
+
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: erase_multiple_arcs.m4scp
+// Description:
+// Файл содержит процедуру удаления кратных дуг (пребразование множества  в канторовское)
+// 1-й аргумент - исходное множество
+// 1-й аргумент - результат
+/////////////////////////////////////////////////////
+// 		Author: Daniil Shunkevich
+//        Date: 11.01.11
+
+#include "scp_keynodes.scsy"
+
+procedure(erase_multiple_arcs,
+[[	
+]],
+[{	
+	a,arc,seg,segments,node,set,temp_set,result,temp,set_arc
+}],
+{[
+	1_: in_: set,
+	2_: out_: result
+]}
+)
+sys_get_location([1_: set, 2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg, 2_: assign_: segments])
+
+searchSetStr3([
+	1_: fixed_: set,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: temp,
+	set3_: assign_: temp_set
+],,exit)
+genEl([1_: assign_: const_: node_: result])
+label(next_node)
+ifVarAssign([1_: set_arc],,noerase_setarc)
+eraseEl([1_: fixed_: set_arc])
+label(noerase_setarc)
+searchElStr3([
+	1_: fixed_: temp_set,
+	2_: assign_: const_: pos_: set_arc,
+	3_: assign_: node
+],,exit)
+searchElStr3([
+	1_: fixed_: result,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: node
+],next_node)
+genElStr3([
+	1_: fixed_: result,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: node
+],next_node,next_node)
+
+label(exit)
+ifVarAssign([1_: temp_set],,no_erase_set)
+eraseEl([1_: fixed_: temp_set])
+label(no_erase_set)
+return()
+end

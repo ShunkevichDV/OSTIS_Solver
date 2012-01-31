@@ -1,0 +1,338 @@
+2011-12-16 17:42:58,736 SCNML2SC INFO Start processing ...
+2011-12-16 17:43:01,137 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:43:01,145 SCNML2SC INFO parsing article:Геометрия:Геометрическая точка
+2011-12-16 17:43:02,907 SCNML2SC INFO ../fs_repo_src\seb/planimetry/0.scsy
+2011-12-16 17:43:03,161 SCNML2SC WARNING Field SCnFieldSpecConRuleIdent has no implimentation
+2011-12-16 17:43:03,171 SCNML2SC INFO Translation was successful!
+2011-12-16 17:43:03,177 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:43:03,183 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:43:03,190 SCNML2SC INFO parsing article:Геометрия:Геометрическая фигура
+2011-12-16 17:43:05,026 SCNML2SC INFO ../fs_repo_src\seb/planimetry/1.scsy
+2011-12-16 17:43:05,444 SCNML2SC WARNING Field SCnFieldSpecConRuleIdent has no implimentation
+2011-12-16 17:43:05,453 SCNML2SC INFO Translation was successful!
+2011-12-16 17:43:05,456 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:43:05,459 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:43:05,461 SCNML2SC INFO parsing article:Геометрия:Геометрическая фигура неограниченного размера
+2011-12-16 17:43:07,275 SCNML2SC INFO ../fs_repo_src\seb/planimetry/2.scsy
+2011-12-16 17:43:07,388 SCNML2SC ERROR Syntax error in article Геометрия:Геометрическая фигура неограниченного размера:
+2011-12-16 17:43:07,392 SCNML2SC ERROR Invalid line №: 51
+2011-12-16 17:43:07,394 SCNML2SC ERROR Line:
+2011-12-16 17:43:07,394 SCNML2SC ERROR {{SCnFieldSpecConAntipode|1}}
+2011-12-16 17:43:07,397 SCNML2SC ERROR ^
+2011-12-16 17:43:07,398 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:43:07,401 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:43:07,404 SCNML2SC INFO parsing article:Геометрия:Геометрическая фигура ограниченного размера
+2011-12-16 17:43:09,313 SCNML2SC INFO ../fs_repo_src\seb/planimetry/3.scsy
+2011-12-16 17:43:09,466 SCNML2SC ERROR Syntax error in article Геометрия:Геометрическая фигура ограниченного размера:
+2011-12-16 17:43:09,471 SCNML2SC ERROR Invalid line №: 65
+2011-12-16 17:43:09,473 SCNML2SC ERROR Line:
+2011-12-16 17:43:09,473 SCNML2SC ERROR {{SCnFieldSpecConAntipode|1}}
+2011-12-16 17:43:09,476 SCNML2SC ERROR ^
+2011-12-16 17:43:09,476 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:43:09,480 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:43:09,483 SCNML2SC INFO parsing article:Геометрия:Геометрическая фигура, в состав которой не входит ни одной граничной точки
+2011-12-16 17:43:11,707 SCNML2SC INFO ../fs_repo_src\seb/planimetry/4.scsy
+2011-12-16 17:43:11,851 SCNML2SC ERROR Syntax error in article Геометрия:Геометрическая фигура, в состав которой не входит ни одной граничной точки:
+2011-12-16 17:43:11,861 SCNML2SC ERROR Invalid line №: 55
+2011-12-16 17:43:11,862 SCNML2SC ERROR Line:
+2011-12-16 17:43:11,862 SCNML2SC ERROR {{SCnFieldSpecConAntipode|1}}
+2011-12-16 17:43:11,865 SCNML2SC ERROR ^
+2011-12-16 17:43:11,865 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:43:11,868 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:43:11,871 SCNML2SC INFO parsing article:Геометрия:Геометрическая фигура, в состав которой входят не все граничные точки
+2011-12-16 17:43:13,890 SCNML2SC INFO ../fs_repo_src\seb/planimetry/5.scsy
+2011-12-16 17:43:14,040 SCNML2SC INFO Translation was successful!
+2011-12-16 17:43:14,046 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:43:14,052 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:43:14,061 SCNML2SC INFO parsing article:Геометрия:Геометрическая фигура, в состав которой входят все граничные точки
+2011-12-16 17:43:16,184 SCNML2SC INFO ../fs_repo_src\seb/planimetry/6.scsy
+2011-12-16 17:43:16,329 SCNML2SC ERROR Syntax error in article Геометрия:Геометрическая фигура, в состав которой входят все граничные точки:
+2011-12-16 17:43:16,338 SCNML2SC ERROR Invalid line №: 59
+2011-12-16 17:43:16,339 SCNML2SC ERROR Line:
+2011-12-16 17:43:16,339 SCNML2SC ERROR {{SCnFieldSpecConAntipode|1}}
+2011-12-16 17:43:16,342 SCNML2SC ERROR ^
+2011-12-16 17:43:16,342 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:43:16,345 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:43:16,348 SCNML2SC INFO parsing article:Геометрия:Геометрическая фигура, имеющая граничные точки
+2011-12-16 17:43:18,065 SCNML2SC INFO ../fs_repo_src\seb/planimetry/7.scsy
+2011-12-16 17:43:18,226 SCNML2SC ERROR Syntax error in article Геометрия:Геометрическая фигура, имеющая граничные точки:
+2011-12-16 17:43:18,232 SCNML2SC ERROR Invalid line №: 52
+2011-12-16 17:43:18,233 SCNML2SC ERROR Line:
+2011-12-16 17:43:18,234 SCNML2SC ERROR {{SCnFieldSpecConAntipode|1}}
+2011-12-16 17:43:18,236 SCNML2SC ERROR ^
+2011-12-16 17:43:18,236 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:43:18,240 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:43:18,243 SCNML2SC INFO parsing article:Геометрия:Геометрическая фигура, не имеющая граничных точек
+2011-12-16 17:43:19,984 SCNML2SC INFO ../fs_repo_src\seb/planimetry/8.scsy
+2011-12-16 17:43:20,117 SCNML2SC ERROR Syntax error in article Геометрия:Геометрическая фигура, не имеющая граничных точек:
+2011-12-16 17:43:20,122 SCNML2SC ERROR Invalid line №: 46
+2011-12-16 17:43:20,125 SCNML2SC ERROR Line:
+2011-12-16 17:43:20,125 SCNML2SC ERROR {{SCnFieldSpecConAntipode|1}}
+2011-12-16 17:43:20,128 SCNML2SC ERROR ^
+2011-12-16 17:43:20,128 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:43:20,131 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:43:20,134 SCNML2SC INFO parsing article:Геометрия:Закрытая полуплоскость H1
+2011-12-16 17:43:22,219 SCNML2SC INFO load images for article: Геометрия:Закрытая полуплоскость H1
+2011-12-16 17:43:22,227 SCNML2SC INFO load image: Файл:SemiplaneH1.png
+2011-12-16 17:43:23,323 SCNML2SC INFO ../fs_repo_src\seb/planimetry/9.scsy
+2011-12-16 17:43:23,355 SCNML2SC ERROR Syntax error in article Геометрия:Закрытая полуплоскость H1:
+2011-12-16 17:43:23,364 SCNML2SC ERROR Invalid line №: 12
+2011-12-16 17:43:23,368 SCNML2SC ERROR Line:
+2011-12-16 17:43:23,368 SCNML2SC ERROR {{SCnLStatement|3|{{SCnLVar|H1}} {{SCn_принадлежность}} {{SCnLConcept|[[Геометрия:Закрытая полуплоскость|закрытая полуплоскость]]}}
+2011-12-16 17:43:23,382 SCNML2SC ERROR ^
+2011-12-16 17:43:23,384 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:43:23,385 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:43:23,388 SCNML2SC INFO parsing article:Геометрия:Закрытый луч m
+2011-12-16 17:43:24,940 SCNML2SC INFO load images for article: Геометрия:Закрытый луч m
+2011-12-16 17:43:24,948 SCNML2SC INFO load image: Файл:LuchM.png
+2011-12-16 17:43:27,346 SCNML2SC INFO ../fs_repo_src\seb/planimetry/10.scsy
+2011-12-16 17:43:27,381 SCNML2SC ERROR Syntax error in article Геометрия:Закрытый луч m:
+2011-12-16 17:43:27,388 SCNML2SC ERROR Invalid line №: 14
+2011-12-16 17:43:27,391 SCNML2SC ERROR Line:
+2011-12-16 17:43:27,391 SCNML2SC ERROR {{SCnLStatement|3|{{SCnLVar|m}} {{SCn_принадлежность}} {{SCnLConcept|[[Геометрия:Закрытый луч|закрытый луч]]}}
+2011-12-16 17:43:27,398 SCNML2SC ERROR ^
+2011-12-16 17:43:27,400 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:43:27,405 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:43:27,411 SCNML2SC INFO parsing article:Геометрия:Интервал (A,,B)
+2011-12-16 17:43:28,961 SCNML2SC INFO load images for article: Геометрия:Интервал (A,,B)
+2011-12-16 17:43:28,971 SCNML2SC INFO load image: Файл:IntervalAB.png
+2011-12-16 17:43:30,374 SCNML2SC INFO ../fs_repo_src\seb/planimetry/11.scsy
+2011-12-16 17:43:30,407 SCNML2SC ERROR Syntax error in article Геометрия:Интервал (A,,B):
+2011-12-16 17:43:30,414 SCNML2SC ERROR Invalid line №: 14
+2011-12-16 17:43:30,417 SCNML2SC ERROR Line:
+2011-12-16 17:43:30,418 SCNML2SC ERROR {{SCnLStatement|3|{{SCnLVar|AB}} {{SCn_принадлежность}} {{SCnLConcept|[[Геометрия:Интервал|интервал]]}}
+2011-12-16 17:43:30,431 SCNML2SC ERROR ^
+2011-12-16 17:43:30,433 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:43:30,440 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:43:30,447 SCNML2SC INFO parsing article:Геометрия:Круг(O,,R)
+2011-12-16 17:43:31,931 SCNML2SC INFO load images for article: Геометрия:Круг(O,,R)
+2011-12-16 17:43:31,940 SCNML2SC INFO load image: Файл:Circle OR.png
+2011-12-16 17:43:33,339 SCNML2SC INFO ../fs_repo_src\seb/planimetry/12.scsy
+2011-12-16 17:43:33,384 SCNML2SC ERROR Syntax error in article Геометрия:Круг(O,,R):
+2011-12-16 17:43:33,391 SCNML2SC ERROR Invalid line №: 12
+2011-12-16 17:43:33,391 SCNML2SC ERROR Line:
+2011-12-16 17:43:33,392 SCNML2SC ERROR {{SCnLStatement|3|{{SCnLVar|(O,,R)}} {{SCn_принадлежность}} {{SCnLConcept|[[Геометрия:Круг|круг]]}};
+2011-12-16 17:43:33,400 SCNML2SC ERROR ^
+2011-12-16 17:43:33,400 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:43:33,404 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:43:33,407 SCNML2SC INFO parsing article:Геометрия:Линейная фигура
+2011-12-16 17:43:34,865 SCNML2SC INFO ../fs_repo_src\seb/planimetry/13.scsy
+2011-12-16 17:43:34,881 SCNML2SC INFO Translation was successful!
+2011-12-16 17:43:34,891 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:43:34,900 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:43:34,907 SCNML2SC INFO parsing article:Геометрия:Линия
+2011-12-16 17:43:36,440 SCNML2SC INFO load images for article: Геометрия:Линия
+2011-12-16 17:43:36,457 SCNML2SC INFO load image: Файл:Line a.png
+2011-12-16 17:43:37,596 SCNML2SC INFO ../fs_repo_src\seb/planimetry/14.scsy
+2011-12-16 17:43:37,789 SCNML2SC WARNING Field SCnFieldSpecConRuleIdent has no implimentation
+2011-12-16 17:43:37,801 SCNML2SC WARNING file ../fs_repo_src\seb/planimetry\files\Line_a.png does not exist
+2011-12-16 17:43:37,813 SCNML2SC INFO Translation was successful!
+2011-12-16 17:43:37,819 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:43:37,825 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:43:37,834 SCNML2SC INFO parsing article:Геометрия:Непланарная фигура
+2011-12-16 17:44:00,469 SCNML2SC INFO ../fs_repo_src\seb/planimetry/15.scsy
+2011-12-16 17:44:00,660 SCNML2SC WARNING Field SCnFieldSpecConRuleIdent has no implimentation
+2011-12-16 17:44:00,665 SCNML2SC INFO Translation was successful!
+2011-12-16 17:44:00,668 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:44:00,671 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:44:00,674 SCNML2SC INFO parsing article:Геометрия:Непрямолинейная тройка точек
+2011-12-16 17:44:02,467 SCNML2SC INFO ../fs_repo_src\seb/planimetry/16.scsy
+2011-12-16 17:44:02,638 SCNML2SC ERROR Syntax error in article Геометрия:Непрямолинейная тройка точек:
+2011-12-16 17:44:02,642 SCNML2SC ERROR Invalid line №: 51
+2011-12-16 17:44:02,644 SCNML2SC ERROR Line:
+2011-12-16 17:44:02,644 SCNML2SC ERROR {{SCnFieldSpecConAntipode|1}}
+2011-12-16 17:44:02,647 SCNML2SC ERROR ^
+2011-12-16 17:44:02,648 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:44:02,651 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:44:02,654 SCNML2SC INFO parsing article:Геометрия:Непрямолинейная тройка точек ABC
+2011-12-16 17:44:04,375 SCNML2SC INFO load images for article: Геометрия:Непрямолинейная тройка точек ABC
+2011-12-16 17:44:04,385 SCNML2SC INFO load image: Файл:Troyaka tochek ABC.png
+2011-12-16 17:44:05,974 SCNML2SC INFO ../fs_repo_src\seb/planimetry/17.scsy
+2011-12-16 17:44:06,012 SCNML2SC ERROR Syntax error in article Геометрия:Непрямолинейная тройка точек ABC:
+2011-12-16 17:44:06,023 SCNML2SC ERROR Invalid line №: 15
+2011-12-16 17:44:06,026 SCNML2SC ERROR Line:
+2011-12-16 17:44:06,026 SCNML2SC ERROR {{SCnLStatement|3|{{SCnLVar|(A,,B,,C)}} {{SCn_принадлежность}} {{SCnLConcept|[[Геометрия:Непрямолинейная тройка точек|непрямолинейная тройка точек]]}}
+2011-12-16 17:44:06,056 SCNML2SC ERROR ^
+2011-12-16 17:44:06,058 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:44:06,065 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:44:06,072 SCNML2SC INFO parsing article:Геометрия:Окружность (O,,R)
+2011-12-16 17:44:07,990 SCNML2SC INFO load images for article: Геометрия:Окружность (O,,R)
+2011-12-16 17:44:07,999 SCNML2SC INFO load image: Файл:CircleOR.png
+2011-12-16 17:44:09,946 SCNML2SC INFO ../fs_repo_src\seb/planimetry/18.scsy
+2011-12-16 17:44:09,976 SCNML2SC ERROR Syntax error in article Геометрия:Окружность (O,,R):
+2011-12-16 17:44:09,983 SCNML2SC ERROR Invalid line №: 12
+2011-12-16 17:44:09,986 SCNML2SC ERROR Line:
+2011-12-16 17:44:09,987 SCNML2SC ERROR {{SCnLStatement|3|{{SCnLVar|(O,,R)}} {{SCn_принадлежность}} {{SCnLConcept|[[Геометрия:Окружность|окружность]]}}
+2011-12-16 17:44:10,009 SCNML2SC ERROR ^
+2011-12-16 17:44:10,012 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:44:10,017 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:44:10,025 SCNML2SC INFO parsing article:Геометрия:Открытая полуплоскость
+2011-12-16 17:44:11,752 SCNML2SC INFO ../fs_repo_src\seb/planimetry/19.scsy
+2011-12-16 17:44:11,924 SCNML2SC ERROR Syntax error in article Геометрия:Открытая полуплоскость:
+2011-12-16 17:44:11,930 SCNML2SC ERROR Invalid line №: 79
+2011-12-16 17:44:11,930 SCNML2SC ERROR Line:
+2011-12-16 17:44:11,931 SCNML2SC ERROR {{SCnFieldSpecConAntipode|1}}
+2011-12-16 17:44:11,934 SCNML2SC ERROR ^
+2011-12-16 17:44:11,934 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:44:11,937 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:44:11,940 SCNML2SC INFO parsing article:Геометрия:Открытая полуплоскость K1
+2011-12-16 17:44:13,607 SCNML2SC INFO load images for article: Геометрия:Открытая полуплоскость K1
+2011-12-16 17:44:13,615 SCNML2SC INFO load image: Файл:SemiplaneK1.png
+2011-12-16 17:44:15,467 SCNML2SC INFO ../fs_repo_src\seb/planimetry/20.scsy
+2011-12-16 17:44:15,497 SCNML2SC ERROR Syntax error in article Геометрия:Открытая полуплоскость K1:
+2011-12-16 17:44:15,509 SCNML2SC ERROR Invalid line №: 12
+2011-12-16 17:44:15,512 SCNML2SC ERROR Line:
+2011-12-16 17:44:15,513 SCNML2SC ERROR {{SCnLStatement|3|{{SCnLVar|H1}} {{SCn_принадлежность}} {{SCnLConcept|[[Геометрия:Открытая полуплоскость|открытая полуплоскость]]}}
+2011-12-16 17:44:15,529 SCNML2SC ERROR ^
+2011-12-16 17:44:15,529 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:44:15,532 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:44:15,536 SCNML2SC INFO parsing article:Геометрия:Открытый луч k
+2011-12-16 17:44:17,200 SCNML2SC INFO load images for article: Геометрия:Открытый луч k
+2011-12-16 17:44:17,209 SCNML2SC INFO load image: Файл:LuchK.png
+2011-12-16 17:44:18,657 SCNML2SC INFO ../fs_repo_src\seb/planimetry/21.scsy
+2011-12-16 17:44:18,694 SCNML2SC ERROR Syntax error in article Геометрия:Открытый луч k:
+2011-12-16 17:44:18,700 SCNML2SC ERROR Invalid line №: 16
+2011-12-16 17:44:18,703 SCNML2SC ERROR Line:
+2011-12-16 17:44:18,706 SCNML2SC ERROR {{SCnLStatement|3|{{SCnLVar|k}} {{SCn_принадлежность}} {{SCnLConcept|[[Геометрия:Открытый луч|открытый луч]]}}
+2011-12-16 17:44:18,721 SCNML2SC ERROR ^
+2011-12-16 17:44:18,721 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:44:18,729 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:44:18,736 SCNML2SC INFO parsing article:Геометрия:Отрезок AB
+2011-12-16 17:44:20,283 SCNML2SC INFO load images for article: Геометрия:Отрезок AB
+2011-12-16 17:44:20,290 SCNML2SC INFO load image: Файл:OtrezokAB.png
+2011-12-16 17:44:21,467 SCNML2SC INFO ../fs_repo_src\seb/planimetry/22.scsy
+2011-12-16 17:44:21,500 SCNML2SC ERROR Syntax error in article Геометрия:Отрезок AB:
+2011-12-16 17:44:21,509 SCNML2SC ERROR Invalid line №: 14
+2011-12-16 17:44:21,512 SCNML2SC ERROR Line:
+2011-12-16 17:44:21,513 SCNML2SC ERROR {{SCnLStatement|3|{{SCnLVar|AB}} {{SCn_принадлежность}} {{SCnLConcept|[[Геометрия:Отрезок|отрезок]]}}
+2011-12-16 17:44:21,526 SCNML2SC ERROR ^
+2011-12-16 17:44:21,528 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:44:21,533 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:44:21,539 SCNML2SC INFO parsing article:Геометрия:Пара точек
+2011-12-16 17:44:23,058 SCNML2SC INFO ../fs_repo_src\seb/planimetry/23.scsy
+2011-12-16 17:44:23,266 SCNML2SC INFO Translation was successful!
+2011-12-16 17:44:23,269 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:44:23,272 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:44:23,276 SCNML2SC INFO parsing article:Геометрия:Планарная поверхность
+2011-12-16 17:44:24,519 SCNML2SC INFO ../fs_repo_src\seb/planimetry/24.scsy
+2011-12-16 17:44:24,538 SCNML2SC INFO Translation was successful!
+2011-12-16 17:44:24,543 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:44:24,551 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:44:24,558 SCNML2SC INFO parsing article:Геометрия:Плоскость
+2011-12-16 17:44:27,132 SCNML2SC INFO ../fs_repo_src\seb/planimetry/25.scsy
+2011-12-16 17:44:27,706 SCNML2SC ERROR Syntax error in article Геометрия:Плоскость:
+2011-12-16 17:44:27,710 SCNML2SC ERROR Invalid line №: 186
+2011-12-16 17:44:27,710 SCNML2SC ERROR Line:
+2011-12-16 17:44:27,711 SCNML2SC ERROR {{SCnFieldSpecConAntipode|1}}
+2011-12-16 17:44:27,713 SCNML2SC ERROR ^
+2011-12-16 17:44:27,713 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:44:27,717 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:44:27,719 SCNML2SC INFO parsing article:Геометрия:Плоскость P
+2011-12-16 17:44:29,303 SCNML2SC INFO load images for article: Геометрия:Плоскость P
+2011-12-16 17:44:29,311 SCNML2SC INFO load image: Файл:PlaneP.png
+2011-12-16 17:44:30,354 SCNML2SC INFO ../fs_repo_src\seb/planimetry/26.scsy
+2011-12-16 17:44:30,375 SCNML2SC ERROR Syntax error in article Геометрия:Плоскость P:
+2011-12-16 17:44:30,381 SCNML2SC ERROR Invalid line №: 13
+2011-12-16 17:44:30,384 SCNML2SC ERROR Line:
+2011-12-16 17:44:30,385 SCNML2SC ERROR {{SCnLStatement|3|{{SCnLVar|P}} {{SCn_принадлежность}} {{SCnLConcept|[[Геометрия:Плоскость|плоскость]]}}|cont}}
+2011-12-16 17:44:30,408 SCNML2SC ERROR ^
+2011-12-16 17:44:30,410 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:44:30,417 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:44:30,424 SCNML2SC INFO parsing article:Геометрия:Поверхность
+2011-12-16 17:44:31,977 SCNML2SC INFO ../fs_repo_src\seb/planimetry/27.scsy
+2011-12-16 17:44:32,134 SCNML2SC WARNING Field SCnFieldSpecConRuleIdent has no implimentation
+2011-12-16 17:44:32,138 SCNML2SC INFO Translation was successful!
+2011-12-16 17:44:32,140 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:44:32,142 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:44:32,145 SCNML2SC INFO parsing article:Геометрия:Полуплоскость
+2011-12-16 17:44:33,803 SCNML2SC INFO ../fs_repo_src\seb/planimetry/28.scsy
+2011-12-16 17:44:34,023 SCNML2SC WARNING Field SCnFieldSpecConRuleIdent has no implimentation
+2011-12-16 17:44:34,026 SCNML2SC WARNING Field SCnFieldSpecConPrototype has no implimentation
+2011-12-16 17:44:34,030 SCNML2SC INFO Translation was successful!
+2011-12-16 17:44:34,032 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:44:34,035 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:44:34,036 SCNML2SC INFO parsing article:Геометрия:Полупространство
+2011-12-16 17:44:35,522 SCNML2SC INFO ../fs_repo_src\seb/planimetry/29.scsy
+2011-12-16 17:44:35,704 SCNML2SC WARNING Field SCnFieldSpecConRuleIdent has no implimentation
+2011-12-16 17:44:35,709 SCNML2SC WARNING Field SCnFieldSpecConPrototype has no implimentation
+2011-12-16 17:44:35,713 SCNML2SC INFO Translation was successful!
+2011-12-16 17:44:35,717 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:44:35,720 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:44:35,723 SCNML2SC INFO parsing article:Геометрия:Предметная область Геометрии Евклида
+2011-12-16 17:44:37,946 SCNML2SC INFO ../fs_repo_src\seb/planimetry/30.scsy
+2011-12-16 17:44:37,966 SCNML2SC ERROR Syntax error in article Геометрия:Предметная область Геометрии Евклида:
+2011-12-16 17:44:37,977 SCNML2SC ERROR Invalid line №: 11
+2011-12-16 17:44:37,980 SCNML2SC ERROR Line:
+2011-12-16 17:44:37,982 SCNML2SC ERROR {{SCnFieldSpecConObjResearch|1}}
+2011-12-16 17:44:37,986 SCNML2SC ERROR ^
+2011-12-16 17:44:37,986 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:44:37,993 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:44:38,002 SCNML2SC INFO parsing article:Геометрия:Пространство
+2011-12-16 17:44:39,753 SCNML2SC INFO ../fs_repo_src\seb/planimetry/31.scsy
+2011-12-16 17:44:39,914 SCNML2SC WARNING Field SCnFieldSpecConRuleIdent has no implimentation
+2011-12-16 17:44:39,917 SCNML2SC WARNING Field SCnFieldSpecConPrototype has no implimentation
+2011-12-16 17:44:39,921 SCNML2SC INFO Translation was successful!
+2011-12-16 17:44:39,924 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:44:39,934 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:44:39,937 SCNML2SC INFO parsing article:Геометрия:Прямая
+2011-12-16 17:45:02,688 SCNML2SC INFO ../fs_repo_src\seb/planimetry/32.scsy
+2011-12-16 17:45:02,990 SCNML2SC WARNING Field SCnFieldSpecConRuleIdent has no implimentation
+2011-12-16 17:45:02,994 SCNML2SC WARNING Field SCnFieldSpecConPrototype has no implimentation
+2011-12-16 17:45:03,000 SCNML2SC INFO Translation was successful!
+2011-12-16 17:45:03,003 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:45:03,006 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:45:03,009 SCNML2SC INFO parsing article:Геометрия:Прямая a
+2011-12-16 17:45:04,398 SCNML2SC INFO load images for article: Геометрия:Прямая a
+2011-12-16 17:45:04,404 SCNML2SC INFO load image: Файл:Pryamayaa.png
+2011-12-16 17:45:05,845 SCNML2SC INFO ../fs_repo_src\seb/planimetry/33.scsy
+2011-12-16 17:45:05,871 SCNML2SC ERROR Syntax error in article Геометрия:Прямая a:
+2011-12-16 17:45:05,874 SCNML2SC ERROR Invalid line №: 12
+2011-12-16 17:45:05,875 SCNML2SC ERROR Line:
+2011-12-16 17:45:05,875 SCNML2SC ERROR {{SCnLStatement|3|{{SCnLVar|a}} {{SCn_принадлежность}} {{SCnLConcept|[[Геометрия:Прямая|прямая]]}}|cont}}
+2011-12-16 17:45:05,882 SCNML2SC ERROR ^
+2011-12-16 17:45:05,884 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:45:05,887 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:45:05,890 SCNML2SC INFO parsing article:Геометрия:Прямолинейная тройка точек
+2011-12-16 17:45:07,482 SCNML2SC INFO ../fs_repo_src\seb/planimetry/34.scsy
+2011-12-16 17:45:07,671 SCNML2SC ERROR Syntax error in article Геометрия:Прямолинейная тройка точек:
+2011-12-16 17:45:07,677 SCNML2SC ERROR Invalid line №: 50
+2011-12-16 17:45:07,677 SCNML2SC ERROR Line:
+2011-12-16 17:45:07,678 SCNML2SC ERROR {{SCnFieldSpecConAntipode|1}}
+2011-12-16 17:45:07,680 SCNML2SC ERROR ^
+2011-12-16 17:45:07,680 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:45:07,684 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:45:07,687 SCNML2SC INFO parsing article:Геометрия:Прямолинейная тройка точек PQR
+2011-12-16 17:45:09,723 SCNML2SC INFO load images for article: Геометрия:Прямолинейная тройка точек PQR
+2011-12-16 17:45:09,733 SCNML2SC INFO load image: Файл:Troyka tochek PQR.png
+2011-12-16 17:45:11,487 SCNML2SC INFO ../fs_repo_src\seb/planimetry/35.scsy
+2011-12-16 17:45:11,525 SCNML2SC ERROR Syntax error in article Геометрия:Прямолинейная тройка точек PQR:
+2011-12-16 17:45:11,536 SCNML2SC ERROR Invalid line №: 15
+2011-12-16 17:45:11,539 SCNML2SC ERROR Line:
+2011-12-16 17:45:11,539 SCNML2SC ERROR {{SCnLStatement|3|{{SCnLVar|(P,,Q,,R)}} {{SCn_принадлежность}} {{SCnLConcept|[[Геометрия:Прямолинейная тройка точек|прямолинейная тройка точек]]}}
+2011-12-16 17:45:11,562 SCNML2SC ERROR ^
+2011-12-16 17:45:11,563 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:45:11,569 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:45:11,576 SCNML2SC INFO parsing article:Геометрия:Прямолинейная фигура
+2011-12-16 17:45:13,173 SCNML2SC INFO ../fs_repo_src\seb/planimetry/36.scsy
+2011-12-16 17:45:13,361 SCNML2SC ERROR Syntax error in article Геометрия:Прямолинейная фигура:
+2011-12-16 17:45:13,365 SCNML2SC ERROR Invalid line №: 70
+2011-12-16 17:45:13,367 SCNML2SC ERROR Line:
+2011-12-16 17:45:13,368 SCNML2SC ERROR {{SCnFieldSpecConAntipode|1}}
+2011-12-16 17:45:13,369 SCNML2SC ERROR ^
+2011-12-16 17:45:13,369 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:45:13,372 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:45:13,375 SCNML2SC INFO parsing article:Геометрия:Точка
+2011-12-16 17:45:14,578 SCNML2SC INFO ../fs_repo_src\seb/planimetry/37.scsy
+2011-12-16 17:45:14,592 SCNML2SC INFO Translation was successful!
+2011-12-16 17:45:14,598 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:45:14,604 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:45:14,611 SCNML2SC INFO parsing article:Геометрия:Тройка точек
+2011-12-16 17:45:16,135 SCNML2SC INFO ../fs_repo_src\seb/planimetry/38.scsy
+2011-12-16 17:45:16,365 SCNML2SC WARNING Field SCnFieldSpecConRuleIdent has no implimentation
+2011-12-16 17:45:16,368 SCNML2SC INFO Translation was successful!
+2011-12-16 17:45:16,371 SCNML2SC INFO ---------------------End---------------------
+2011-12-16 17:45:16,372 SCNML2SC INFO --------------------Begin--------------------
+2011-12-16 17:45:16,375 SCNML2SC INFO parsing article:Геометрия:Фигура
+2011-12-16 17:45:17,614 SCNML2SC INFO ../fs_repo_src\seb/planimetry/39.scsy
+2011-12-16 17:45:17,630 SCNML2SC INFO Translation was successful!
+2011-12-16 17:45:17,634 SCNML2SC INFO ---------------------End---------------------

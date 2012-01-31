@@ -1,0 +1,464 @@
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2011 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+//----------------------------------------------------------------------
+//        File: search_of_all_supersets.m4scp
+// Description: Операция поиска всех надмножеств указанного понятия
+//----------------------------------------------------------------------
+//              Author: Anton Svitenkov
+//        Date: 20.11.11
+
+
+#include "scp_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "com_keynodes.scsy"
+#include "lib_answer.scsy"
+#include "lib_search.scsy"
+
+
+//программа инициализации операции
+program(init_op,
+[[
+	// 	ключевой узел инициированный вопрос
+	q_initiated;
+	// множество элементов для которых будут отслеживаться события
+	run_op;
+	catch_output_arc;
+	]],
+[{
+}])
+
+
+sys_set_event_handler([
+	1_: fixed_: catch_output_arc,
+	2_: fixed_: run_op,
+	3_: fixed_: {1_: q_initiated}
+	])
+
+
+return()
+end()
+
+//процедура обработки вопроса и генерации ответа
+procedure(run_op,
+[[
+		search_of_all_supersets;
+		nrel_prop_inclusion;
+		q_search_all_supersets;
+		rrel_subset;
+		rrel_superset;
+]],
+[{
+        // input params
+        descr, question_node,result,descr2,cur_el,
+        segment,element, arc, test, tNode1, tNode2,t_seg, questionSet,
+        tArc1, tArc2
+}],
+{[
+        1_: in_: descr,
+        2_: in_: element,
+        3_: in_: arc,
+        4_: in_: question_node
+]}
+)
+
+printNl([1_: fixed_: /"checking: Op_search_of_all_supersets"/])
+sys_get_location([1_: fixed_: question_node, 2_: assign_: segment])
+sys_spin_segment([1_: fixed_: segment, 2_: assign_: t_seg])
+sys_open_segment([1_: fixed_: segment])
+sys_set_default_segment([1_: fixed_: segment])
+// проверка вопроса
+searchElStr3([
+	1_: fixed_: q_search_all_supersets,
+	2_: assign_: arc_: const_: pos_: tArc1,
+	3_: fixed_: question_node
+], ,finish_op,runtime_error)
+
+//копируем все узлы из множества вопроса
+searchSetStr3([
+                 1_:  fixed_: question_node,
+                 2_: assign_: const_: pos_: arc,
+                 3_: assign_: tNode1,
+                 set3_: assign_: questionSet
+    ], , ,runtime_error)
+
+// вызываем программу поиска для каждого элемента
+callReturn([
+        1_: fixed_: search_base_cycle,
+        2_: fixed_: {[
+                1_: question_node,
+                2_: search_of_all_supersets,
+                3_: result
+                ]}
+        ], , , runtime_error)
+
+//удаляем из ответа узлы вопроса
+// цикл по узлам вопроса
+label(delete_question_nodes_from_result_begin)
+    searchElStr3([
+        1_:  fixed_: questionSet,
+        2_: assign_: tArc1,
+        3_: assign_: cur_el
+    ],,delete_question_nodes_from_result_end, runtime_error)
+
+    eraseEl([1_: fixed_: f_: tArc1])
+
+    searchElStr3([
+        1_:  fixed_: result,
+        2_: assign_: tArc1,
+        3_: fixed_: cur_el
+    ],,delete_question_nodes_from_result_beg, runtime_error)
+
+    eraseEl([1_: f_: tArc1])
+
+nop(delete_question_nodes_from_result_begin)
+label(delete_question_nodes_from_result_end)
+
+// необходимо добавить в ответ узел отношения "строгое включение" и узлы атрибутов
+// но добавить только в том случае, если в ответе есть хоть 1 узел не равный начальному
+searchElStr3([
+	1_:  fixed_: result,
+	2_: assign_: arc_: const_: pos_: tArc1,
+	3_: assign_: node_: const_: tNode1
+], ,make_answer_end,runtime_error)
+
+// необходимо добавить узел отношения и узлы атрибутов  вответ
+// добавляем отношение
+genElStr3([
+    1_:  fixed_: result,
+    2_: assign_: arc_: pos_: const_: tArc1,
+    3_:  fixed_: nrel_prop_inclusion
+])
+
+// добавляем атрибуты
+genElStr3([
+    1_:  fixed_: result,
+    2_: assign_: arc_: pos_: const_: tArc1,
+    3_:  fixed_: rrel_superset
+])
+genElStr3([
+    1_:  fixed_: result,
+    2_: assign_: arc_: pos_: const_: tArc1,
+    3_:  fixed_: rrel_subset
+])
+
+label(make_answer_end)
+// добавляем результаты в ответ
+	callReturn([
+		1_: fixed_: answer_make,
+		2_: fixed_: {[
+			1_: question_node,
+			2_: result
+		]}
+],finish_op,,runtime_error)
+
+
+
+
+label(finish_op)
+return()
+
+// сообщение об ошибке во время выполнения
+label(runtime_error)
+printNl([1_: fixed_: /"\nOp_search_of_all_supersets\nruntime_error"/])
+return()
+
+end()
+
+
+
+procedure(search_of_all_supersets,
+[[
+		nrel_prop_inclusion;
+		newWave =c=/"newWave"/;
+		lastWave =c=/"lastWave"/;
+		tempResultnrel_prop_inclusionation =c=/"tempResultnrel_prop_inclusionation"/;
+
+]],
+[{
+        // input params
+        descr, element, arc, question_node,result,
+        segment,tDescr,
+        tArc1, tArc2,
+        tNode1, tNode2, currentNodeInLastWave, arcOfCurrentNodeInLastWave
+
+}],
+{[
+        1_: in_: question_node,
+        2_: in_: result
+]}
+)
+
+sys_get_location([1_: fixed_: question_node, 2_: assign_: segment])
+sys_open_segment([1_: fixed_: segment])
+sys_set_default_segment([1_: fixed_: segment])
+
+
+
+// добавляем переданный узел понятия в предыдущую волну для начала цикла
+genElStr3([
+	1_: fixed_: lastWave,
+	2_: assign_: const_: pos_: tArc1,
+	3_:  fixed_: question_node
+],,,runtime_error)
+
+
+// начало цикл поиска надмножеств
+label(cycle_search_all_supersets_begin)
+	// проверка мощности прошлой волны lastWave
+    // если мощность не нулевая, то продолжаем цикл
+	searchElStr3([
+		1_: fixed_: lastWave,
+		2_: assign_: const_: pos_: arc_: tArc1,
+		3_: assign_: tNode1
+	], , cycle_search_all_supersets_end, runtime_error)
+	// цикл для обработки множества lastWave
+	// цикл по всем элементам множестсва lastWave
+	// в цикле)для каждого элемента находим множество его надмножеств, заносим множество надмножест в множество newWave
+	// в цикле)удаляем текущий элемент из множества lastWave
+	// добавляем все узлы из lastWave в ответ - множество result
+	// все элементы из множества newWave добавляем в множество lastWave
+	// возвращаемся к началу цикла
+
+
+	label(begin_processing_cycle_of_set_lastWave)
+	//#printNl([1_: fixed_: /"\n Start of cycle \n"/])
+		// проверяем мощность lastWave
+		searchElStr3([
+			1_: fixed_: lastWave,
+			2_: assign_: const_: pos_: arc_: arcOfCurrentNodeInLastWave,
+			3_: assign_: currentNodeInLastWave
+		],, end_processing_cycle_of_set_lastWave, runtime_error)
+		// мощность не нулевая
+		// currentNodeInLastWave - текущий узел множества
+		// arcOfCurrentNodeInLastWave - дуга из lastWawe в currentNodeInLastWave
+		// ищем все надмножества для текущего узла и добавляем найденные в множество newWava
+		callReturn([
+        1_: fixed_: search_rel_strict_inclusion,
+        2_: fixed_: {[
+                1_: currentNodeInLastWave,
+                2_: newWave,
+                3_: result
+                ]}
+        ], , , runtime_error)
+
+
+        // удаляем текущий узел множества currentNodeInLastWave из множства lastWave
+        // для этого удаляем дугу, которая их соединяет - arcOfCurrentNodeInLastWave
+        eraseEl([
+             1_: fixed_: arcOfCurrentNodeInLastWave
+         ])
+		// проверяем мощность множества lastWave
+		// если мощность не нулевая (остались непросмотренные узлы) - переходим к началу цикла
+		// иначе завершаем цикл
+		searchElStr3([
+			1_: fixed_: lastWave,
+			2_: assign_: const_: pos_: arc_: arcOfCurrentNodeInLastWave,
+			3_: assign_: currentNodeInLastWave
+		], begin_processing_cycle_of_set_lastWave, end_processing_cycle_of_set_lastWave, runtime_error)
+	label(end_processing_cycle_of_set_lastWave)
+
+	// добавляем все узлы из newWave в lastWave
+	searchSetStr3([
+                 1_:  fixed_: newWave,
+                 2_: assign_: const_: pos_: arc,
+                 3_: assign_: tNode1,
+                 set3_: fixed_: lastWave
+    ], , ,runtime_error)
+
+	// удаляем все узлы из newWave
+
+	label([next_label_del_newWave])
+    searchElStr3([
+        1_:  fixed_: newWave,
+        2_: assign_: tArc1,
+        3_: assign_: tNode1
+    ],, break_label_del_newWave)
+
+    eraseEl([1_: fixed_: f_: tArc1])
+    nop(next_label_del_newWave)
+
+
+	label(break_label_del_newWave)
+	searchElStr3([
+			1_: fixed_: lastWave,
+			2_: assign_: const_: pos_: arc_: arcOfCurrentNodeInLastWave,
+			3_: assign_: currentNodeInLastWave
+		], cycle_search_all_supersets_begin, cycle_search_all_supersets_end, runtime_error)
+label(cycle_search_all_supersets_end)
+
+
+
+// добавляем результаты в ответ
+	callReturn([
+		1_: fixed_: answer_make,
+		2_: fixed_: {[
+			1_: question_node,
+			2_: result
+		]}
+],finish_op,,runtime_error)
+
+
+label(finish_op)
+
+return()
+
+
+label(runtime_error)
+printNl([1_: fixed_: /"\nOp_search_of_all_supersets\nruntime_error"/])
+return()
+
+end()
+
+
+procedure(search_rel_strict_inclusion,
+[[
+	rrel_subset;
+	rrel_superset;
+	nrel_prop_inclusion;
+]],
+[{
+	node, resultSet,
+	tNode1, tArc1, tArc2, curEl, elSuperset,
+	e1,e2,e3,e4,e5,e6,e7,e8,answerSet,
+	segment, descr, tempSet1
+
+}],
+{[
+	1_:  in_: node,
+	2_:  in_: resultSet,
+	3_:  in_: answerSet
+]})
+
+sys_get_location([1_: fixed_: node, 2_: assign_: segment])
+sys_open_segment([1_: fixed_: segment])
+sys_set_default_segment([1_: fixed_: segment])
+
+// находим пятиэлементную конструкцию 1 эл - неизвестный, 3 - переданный узел node, 5 - атрибут подмножество_
+searchSetStr5([
+                 1_: assign_: const_: tNode1,
+                 2_: assign_: const_: pos_: tArc1,
+                 3_: fixed_: node_ : node,
+                 4_: assign_: const_: pos_: tArc2,
+                 5_: fixed_: const_: rrel_subset,
+                 set1_: assign_: tempSet1
+               ],, finish, runtime_error)
+
+// tempSet1 - множество элементов узлов (-)
+// цикл по всем элементам множества tempSet1
+label(begin_cycle_of_all_elemtnt_tempSet1)
+	//берём элемент из множества
+   	 searchElStr3([
+    	    1_:  fixed_: tempSet1,
+    	    2_: assign_: tArc1,
+    	    3_: assign_: curEl
+   	 ],, end_cycle_of_all_elemtnt_tempSet1, runtime_error)
+     eraseEl([1_: fixed_: f_: tArc1])
+    // проверяем, все ли они принадлежат отношению "строгое включение"
+    searchElStr3([
+    	    1_:  fixed_: nrel_prop_inclusion,
+    	    2_: assign_: tArc1,
+    	    3_:  fixed_: curEl
+   	 ],, begin_cycle_of_all_elemtnt_tempSet1, runtime_error)
+   	// нашли искомое отношение
+	// ищим пятиэлементную конструкцию 1 эл - curEl, 3 - неизвестный, 5 - атрибут надмножество_
+	searchElStr5([
+    	1_:  fixed_: curEl,
+   	 	2_: assign_: arc_: pos_: const_: e4,
+    	3_: assign_: elSuperset,
+    	4_: assign_: arc_: pos_: const_: e7,
+    	5_:  fixed_: rrel_superset
+	],,begin_cycle_of_all_elemtnt_tempSet1,runtime_error)
+	// проверяем, есть ли в ответе этот узел
+	// если есть - ничего не делаем, если нет - добавляем связку
+	searchElStr3([
+    	    1_:  fixed_: answerSet,
+    	    2_: assign_: e1,
+    	    3_: fixed_: elSuperset
+   	 ],begin_cycle_of_all_elemtnt_tempSet1, , runtime_error)
+   	// такого узла нет
+	// ищем недостающие элементы связки
+	// конструкция с атрибутом подмножество
+	searchElStr5([
+    	1_:  fixed_: curEl,
+    	2_: assign_: arc_: pos_: const_: e2,
+    	3_: fixed_: node,
+    	4_: assign_: arc_: pos_: const_: e6,
+    	5_:  fixed_: rrel_subset
+	],,,runtime_error)
+	// дуга из отношения в узел связки
+	searchElStr3([
+    	    1_:  fixed_: nrel_prop_inclusion,
+    	    2_: assign_: e8,
+    	    3_: fixed_: curEl
+   	],, , runtime_error)
+	// добавляем найденное в ответ
+	genElStr3([
+    	1_:  fixed_: answerSet,
+    	2_: assign_: arc_: pos_: const_: tArc1,
+    	3_:  fixed_: e2
+	])
+	genElStr3([
+    	1_:  fixed_: answerSet,
+    	2_: assign_: arc_: pos_: const_: tArc1,
+    	3_:  fixed_: curEl
+	])
+	genElStr3([
+    	1_:  fixed_: answerSet,
+    	2_: assign_: arc_: pos_: const_: tArc1,
+    	3_:  fixed_: e4
+	])
+	genElStr3([
+    	1_:  fixed_: answerSet,
+    	2_: assign_: arc_: pos_: const_: tArc1,
+    	3_:  fixed_: elSuperset
+	])
+	genElStr3([
+    	1_:  fixed_: answerSet,
+    	2_: assign_: arc_: pos_: const_: tArc1,
+    	3_:  fixed_: e6
+	])
+	genElStr3([
+    	1_:  fixed_: answerSet,
+    	2_: assign_: arc_: pos_: const_: tArc1,
+    	3_:  fixed_: e7
+	])
+	genElStr3([
+    	1_:  fixed_: answerSet,
+    	2_: assign_: arc_: pos_: const_: tArc1,
+    	3_:  fixed_: e8
+	])
+	// добавляем найденный узел в результирующее множество переданное в параметрах
+	genElStr3([
+    	1_:  fixed_: resultSet,
+   		2_: assign_: arc_: pos_: const_: tArc1,
+    	3_:  fixed_: elSuperset
+	],begin_cycle_of_all_elemtnt_tempSet1,runtime_error,runtime_error)
+label(end_cycle_of_all_elemtnt_tempSet1)
+
+label(finish)
+return()
+
+
+label(runtime_error)
+
+end

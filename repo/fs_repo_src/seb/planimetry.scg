@@ -1,0 +1,11 @@
+#include "ordinal.scsy"
+#include "meta_info.scsy"
+#include "ui_keynodes.scsy"
+planimetry\triangle.gwf
+planimetry\Длина отрезка.gwf
+planimetry\Значения_Геометрия.gwf
+planimetry\Периметр треугольника.gwf
+planimetry\Площадь на радиус вписанной окружности.gwf
+planimetry\Теорема о биссектрисе.gwf
+planimetry\Формула Герона.gwf
+

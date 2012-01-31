@@ -1,0 +1,30 @@
+//#sss
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+
+procedure(disable_arifmetic_processor,
+[[	
+]],
+[{
+	arc,descr
+}],
+{[
+]}
+)
+
+label(next)
+ifVarAssign([1_: descr],,noerase)
+eraseEl([1_: fixed_: descr])
+label(noerase)
+searchElStr3([
+	1_: fixed_: group_arifmetic_descr,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: descr
+],,exit)
+sys_delete_event_handler([
+	1_: fixed_: descr
+],next,next)
+
+label(exit)
+return()
+end

@@ -1,0 +1,82 @@
+//#sss
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "lib_gen.scsy"
+
+program(fragment_all_impl_conclusions,
+[[	
+	nrel_impl;
+	gen_conclusion_fragmentation_request;
+]],
+[{
+	arc,descr,temp,arc1,impl_set,impl_arc,curr_impl,
+	seg,segments,inp_set,then
+}],
+{[
+]}
+)
+printNl([1_: /"FRAGMENTING CONCLUSIONS..."/])
+searchSetStr3([
+	1_: fixed_: nrel_impl,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: temp,
+	set3_: assign_: impl_set
+])
+
+label(next_impl)
+ifVarAssign([1_: impl_arc],,no_erase_impl)
+eraseEl([1_: impl_arc])
+label(no_erase_impl)
+searchElStr3([
+	1_: fixed_: impl_set,
+	2_: assign_: const_: pos_: impl_arc,
+	3_: assign_: const_: node_: curr_impl
+],,exit)
+///////////////////////////////////////////////
+//Theory check
+searchSetStr3([
+	1_: assign_: const_: node_: temp,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: curr_impl,
+	set1_: assign_: inp_set
+])
+selectYStr3([
+	1_: fixed_: group_theory,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: temp,
+	set3_: fixed_: inp_set
+])
+searchElStr3([
+	1_: fixed_: inp_set,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: temp
+],,next_impl)
+searchElStr5([
+	1_: fixed_: curr_impl,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: then,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 2_
+],,next_impl)
+searchElStr3([
+	1_: fixed_: group_atomic_existence_single,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: then
+],,next_impl)
+
+callReturn([1_: fixed_: gen_conclusion_fragmentation_request,
+	    2_: fixed_:
+		{[
+			1_: fixed_: curr_impl,
+			2_: assign_: temp
+		]}
+],next_impl,next_impl)
+
+label(exit)
+ifVarAssign([1_: impl_set],,no_erase_set)
+eraseEl([1_: fixed_: impl_set])
+label(no_erase_set)
+printNl([1_: /"FRAGMENTING CONCLUSIONS COMPLETED"/])
+return()
+end

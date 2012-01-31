@@ -1,0 +1,214 @@
+
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: search_all_output_pos_arcs_with_attr.m4scp
+// Description: File contains operation for 
+//				all output pairs searching
+//				Input arguments includes into result set
+/////////////////////////////////////////////////////
+// 		Author: Denis Koronchik, Daniil Shunkevich
+//        Date: 16.12.11
+
+#include "scp_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "lib_search.scsy"
+#include "lib_set.scsy"
+#include "meta_info.scsy"
+#include "lib_answer.scsy"
+
+// program that initialize operation
+program(init_op,
+[[
+	q_initiated;
+	elmn_pattern = {1_: q_initiated };
+	catch_output_arc;
+	answer_make;		//	procedure to make answer
+]],
+[{
+}])
+
+// subscribe to handle output pairs from "initiated question" node
+sys_set_event_handler([
+	1_: fixed_: catch_output_arc,
+	2_: fixed_: search_all_output_pos_arcs_with_attr,
+	3_: fixed_: elmn_pattern
+	])
+	
+return()
+end()
+
+// procedure, that process question and make answer
+procedure(search_all_output_pos_arcs_with_attr,
+[[
+	q_search_all_pos_out_arcs;
+	set_sub;
+	set_rm_el;
+	set_merge;
+	search_all_output_pos_arcs;
+	search_base_cycle;
+	stype_bin_orient_role_rel;
+]],
+[{
+	// input params
+	descr, element, arc, question_node,
+	// other
+	descr2, result, tmp_res, el_for_process, el_set, arc, arc1, temp, segment, value,
+	set_2, set_3, set_4, set_5, answer, elem, attr, attr_arc, temp1,seg,segments
+}],
+{[
+	1_: in_: descr,
+	2_: in_: element,
+	3_: in_: arc,
+	4_: in_: question_node
+]}
+)
+sys_get_location([1_: question_node,2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+
+searchElStr3([
+	1_: fixed_: q_search_all_pos_out_arcs_with_attr,
+	2_: assign_: const_: pos_: arc_: arc,
+	3_: fixed_: question_node
+],,exit)
+
+searchElStr3([
+	1_: fixed_: question_node,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: value
+],,exit)
+
+searchSetStr3([
+	1_: fixed_: value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: temp,
+	set2_: assign_: set_2,
+	set3_: assign_: set_3
+],,exit)
+
+genEl([1_: assign_: const_: node_: answer])
+
+genElStr3([
+	1_: fixed_: answer,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: value
+])
+
+searchSetStr3([
+	1_: fixed_: set_3,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: temp,
+	set3_: fixed_: answer
+])
+searchSetStr3([
+	1_: fixed_: set_2,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: temp,
+	set3_: fixed_: answer
+])
+
+label(next_arc)
+searchElStr3([
+	1_: fixed_: set_2,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: elem
+],,end_cycle)
+eraseEl([1_: fixed_: arc])
+searchSetStr3([
+	1_: assign_: node_: temp,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: elem,
+	set2_: assign_: set_4,
+	set1_: assign_: set_5
+])
+
+searchSetStr3([
+	1_: fixed_: set_4,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: temp,
+	set3_: fixed_: set_4_copy
+])
+
+label(next_attr_arc)
+searchElStr3([
+	1_: fixed_: set_4_copy,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: attr_arc
+],,end_attr_cycle)
+eraseEl([1_: fixed_: arc])
+searchElStr3([
+	1_: assign_: attr,
+	2_: fixed_: attr_arc,
+	3_: assign_: temp1
+])
+searchElStr3([
+	1_: fixed_: stype_bin_orient_role_rel,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: attr
+],next_attr_arc)
+eraseElStr3([
+	1_: fixed_: set_4,
+	2_: assign_: const_: pos_: f_: arc,
+	3_: fixed_: attr_arc
+])
+eraseElStr3([
+	1_: fixed_: set_5,
+	2_: assign_: const_: pos_: f_: arc,
+	3_: fixed_: attr
+],next_attr_arc,next_attr_arc)
+
+label(end_attr_cycle)
+
+searchSetStr3([
+	1_: fixed_: set_4,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: temp,
+	set3_: fixed_: answer
+])
+searchSetStr3([
+	1_: fixed_: set_5,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: temp,
+	set3_: fixed_: answer
+])
+nop(next_arc)
+
+label(end_cycle)
+
+printEl([1_: /"ANSWER"/])
+printEl([1_: answer])
+
+/////////////////////////////////////////////////////
+// Call of the answer making procedure
+callReturn([
+	1_:	fixed_: answer_make,
+	2_:	fixed_: {[
+			1_: question_node,
+			2_: answer
+		]}
+])
+
+label(exit)
+return()
+end()

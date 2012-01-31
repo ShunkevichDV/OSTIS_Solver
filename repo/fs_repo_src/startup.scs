@@ -1,0 +1,90 @@
+
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+
+	
+	
+
+	
+
+*/
+
+
+// Запуск программ при старте процессорного модуля
+
+"/proc/keynode/current_module" -> "/proc/keynode/startup_" : {
+
+	/*"/operation/search_all_output_pos_arcs_with_attr/init_op",
+	"/operation/search_all_input_pos_arcs/init_op",
+	"/operation/search_all_output_pos_arcs/init_op",
+	"/operation/search_authors/init_op",
+	"/operation/search_identifiers/init_op",
+	"/operation/search_decomposition/init_op",
+	"/operation/search_illustration/init_op",*/
+
+	/*"/operation/ui_add_child_command/init_op",
+	"/operation/ui_remove_child_command/init_op",
+	"/operation/verify_all/init_op",
+	
+	"/operation/construct_start/init_op",
+	"/operation/erase_elements/init_op",
+	"/operation/element_content_subroutine/init_op",
+	//#"/operation/hello_world/hello_world",*/
+	"/operation/conclusion_fragmentation/init_op",
+	//#"/operation/check_generalized_statement_eq/init_op",
+	//#"/operation/check_generalized_statement_impl/init_op",
+	//#"/operation/validity_eq_statement/init_op",
+	//#"/operation/check_validity/init_op",
+	"/operation/find_value/init_op",
+//#	"/operation/find_orient_binary_relation_link/init_op",
+	//#"/operation/find_noorient_relation_link/init_op",
+//#	"/operation/find_formula/init_op",
+	"/operation/postorder_tree_search_manager/init_op",
+	"/operation/postorder_tree_search_op/init_op",
+	"/operation/find_value_production/init_op",
+	"/operation/gen_transitive_links/init_op",
+	"/operation/gen_all_memberships/init_op",
+	"/operation/gen_private_impl/init_op",
+	"/operation/check_atomic_statement_validity/init_op",
+	"/operation/check_atomic_statement_validity_prov/init_op",
+	"/operation/check_impl_statement_validity_prov/init_op",
+	"/operation/preprocessing/preprocessing"
+	//#"/operation/find_sc_program/init_op"
+	//#"/operation/discovery/discovery"
+	/*"/operation/geometry_menu_operations/get_square/init_op",
+	"/operation/geometry_menu_operations/get_perimeter/init_op",
+	
+	"/operation/search_antipode/init_op",
+	"/operation/search_bibliography/init_op",
+	"/operation/search_definition/init_op",
+	"/operation/search_explanation/init_op",
+	"/operation/search_partition/init_op",
+	"/operation/search_proof/init_op",
+	"/operation/search_prototype/init_op",
+	"/operation/search_rel_connect_diff_concepts/init_op",
+	"/operation/search_rel_connect_same_concepts/init_op",
+	"/operation/search_rel_domain/init_op",
+	"/operation/search_rel_intersect_with_concept/init_op",
+	"/operation/search_rel_schema/init_op",
+	"/operation/search_statement/init_op",
+	"/operation/search_of_all_supersets/init_op",
+	"/operation/search_binary_relations_connecting_two_concept/init_op"*/
+};

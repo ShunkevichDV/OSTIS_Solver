@@ -1,0 +1,40 @@
+//#sss
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "lib_other.scsy"
+#include "lib_gen.scsy"
+
+program(temp3,
+[[	
+	link="/seb/planimetry/STAT";
+	here=/"\n\nTEMP3 ended!\n\n"/;
+	contur="/seb/planimetry/CONTUR";
+]],
+[{
+	arc,descr,temp,arc_set,curr_arc
+}],
+{[
+]}
+)
+genElStr3([
+	1_: fixed_: q_validity,
+	2_: assign_: arc,
+	3_: assign_: const_: node_: temp
+])
+genElStr3([
+	1_: fixed_: temp,
+	2_: assign_: arc,
+	3_: fixed_: link
+])
+
+genElStr3([
+	1_: fixed_: q_initiated,
+	2_: assign_: arc,
+	3_: fixed_: temp
+])
+
+printNl([1_: here])
+label(exit)
+return()
+end

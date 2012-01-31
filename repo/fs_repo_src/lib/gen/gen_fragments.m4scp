@@ -1,0 +1,141 @@
+// 
+#include "scp_keynodes.scsy"
+#include "lib_search.scsy"
+#include "lib_gen.scsy"
+#include "lib_set.scsy"
+#include "lib_other.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "meta_info.scsy"
+
+procedure(gen_fragments,
+[[	
+	first=1_;
+	second=2_;
+	set_attr=set_;
+	fixed_attr=fixed_;
+	stype_element;	
+	
+	//#отладочная информация, закомментировать или убрать	
+	here=/"\n\nI have entered gen_fragmented_conclusion!!!\n\n"/;
+	exited=/"\n\nI have exited gen_fragmented_conclusion!!!\n\n"/;
+	find_th=/"\n\nsearch_node_theory is OK!!!\n\n"/;
+	not_find_th=/"\n\nsearch_node_theory is ERROR!!!\n\n"/;
+	find_obs=/"\n\nsearch_node_objects is OK!!!\n\n"/;
+	not_find_obs=/"\n\nsearch_node_objects is ERROR!!!\n\n"/;
+	find_if_then=/"\n\nsearch_first_and_second is OK!!!\n\n"/;
+	not_find_if_then=/"\n\nsearch_first_and_second is ERROR!!!\n\n"/;
+	find_linked=/"\n\nsearch_linked_nodes is OK!!!\n\n"/;
+	not_find_linked=/"\n\nsearch_linked_nodes is ERROR!!!\n\n"/;	
+	
+]],
+[{	
+	relations_set,el,inputarc,arc,arc1,req_arc,value,handler,element,
+	seg,segments,temp,set,set2,t,const_then,theory,objects,sheaf,if,then,linked,
+	section,attr,result,fragments,simple_fragments,bin_orient_relations_set,descr
+}],
+{[		
+	1_: in_: then,	
+	2_: out_: fragments
+]}
+)
+sys_get_location([1_: then,2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+
+printNl([1_: here])
+
+/////////////////////////////////////////////////////
+callReturn([1_: fixed_: gen_fragmented_bin_orient_relations,
+	    2_: fixed_:
+		{[
+			1_: fixed_: then,
+			2_: assign_: bin_orient_relations_set		
+		]}
+])
+/////////////////////////////////////////////////////
+
+printEl([1_:bin_orient_relations_set])
+callReturn([1_: fixed_: print_sys_search,
+	    2_: fixed_:
+		{[
+			1_: fixed_: bin_orient_relations_set
+		]}
+])
+
+/////////////////////////////////////////////////////
+callReturn([1_: fixed_: gen_fragmented_relations,
+	    2_: fixed_:
+		{[
+			1_: fixed_: then,
+			2_: assign_: relations_set		
+		]}
+])
+/////////////////////////////////////////////////////
+
+printEl([1_:relations_set])
+callReturn([1_: fixed_: print_sys_search,
+	    2_: fixed_:
+		{[
+			1_: fixed_: relations_set
+		]}
+])
+
+/////////////////////////////////////////////////////
+callReturn([1_: fixed_: gen_simple_fragments,
+	    2_: fixed_:
+		{[
+			1_: fixed_: then,
+			2_: assign_: simple_fragments
+		]}
+])
+/////////////////////////////////////////////////////
+
+printEl([1_:simple_fragments])
+callReturn([1_: fixed_: print_sys_search,
+	    2_: fixed_:
+		{[
+			1_: fixed_: simple_fragments
+		]}
+])
+
+genEl([1_: const_: node_: assign_: fragments])
+
+/////////////////////////////////////////////////////
+callReturn([1_: fixed_: sets_union,
+	    2_: fixed_:
+		{[
+			1_: fixed_: bin_orient_relations_set,
+			2_: fixed_: fragments,
+			3_: assign_: fragments
+		]}
+])
+/////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////
+callReturn([1_: fixed_: sets_union,
+	    2_: fixed_:
+		{[
+			1_: fixed_: relations_set,
+			2_: fixed_: fragments,
+			3_: assign_: fragments
+		]}
+])
+/////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////
+callReturn([1_: fixed_: sets_union,
+	    2_: fixed_:
+		{[
+			1_: fixed_: simple_fragments,
+			2_: fixed_: fragments,
+			3_: assign_: fragments
+		]}
+])
+/////////////////////////////////////////////////////
+
+label(exit)
+
+printNl([1_: exited])
+return()
+end

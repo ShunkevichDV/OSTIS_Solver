@@ -1,0 +1,284 @@
+
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: find_sc_program.m4scp
+// Description: File contains operation to search
+// sc-program which can be used to solve current task
+/////////////////////////////////////////////////////
+// 		Author: Daniil Shunkevich
+//        Date: 15.04.11
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "lib_search.scsy"
+#include "externals.scsy"
+
+program(init_op,
+[[	
+	q_initiated;
+	catch_output_arc;
+]],
+[{
+	nodeVar
+}],
+{[
+]}
+)
+
+sys_set_event_handler([
+	1_: fixed_: catch_output_arc,
+	2_: fixed_: find_sc_program,
+	3_: fixed_: {1_: q_initiated},
+	4_: assign_: nodeVar
+])
+
+return()
+end
+
+procedure(find_sc_program,
+[[
+	here=/"\n\nI have entered FIND SC-PROGRAM\n\n"/;
+	exited=/"\n\nI have exited FIND SC-PROGRAM\n\n"/;
+	request_pattern=[
+		__arc=(question->>>__quest);
+		_contour->>question;
+		_contour->>__quest;
+		_contour->>__arc;
+	];
+]],
+[{	
+	inputarc,arc,arc1,value,seg,segments,temp,input_value,set,next_arc,prog,start_condition,quest,
+	answer,req1,req2,req3,req4,req5,req6,req7,req8,req9
+}],
+{[
+	1_: in_: handler,
+	2_: in_: element,
+	3_: in_: inputarc,
+	4_: in_: input_value
+]}
+)
+sys_get_location([1_: input_value,2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+
+///////////////////////////////////////////////
+// FIND NODE
+//////////////////////////////////////////////
+
+printNl([1_: here])
+
+searchSetStr3([
+	1_: fixed_: group_sc_program,
+	2_: assign_: pos_: const_: arc,
+	3_: assign_: const_: node_: temp,
+	set3_: assign_: set
+])
+
+label(next)
+ifVarAssign([1_: next_arc],,no_erase)
+eraseEl([1_: next_arc])
+label(no_erase)
+searchElStr3([
+	1_: fixed_: set,
+	2_: assign_: const_: pos_: next_arc,
+	3_: assign_: const_: node_: prog
+],,gen_bad_result)
+
+printEl([1_: prog])
+
+callReturn([
+	1_: fixed_: search_bin_pair_begin_proc,
+	2_: fixed_:
+		{[
+			1_: fixed_: prog,
+			2_: fixed_: nrel_start_condition,
+			3_: assign_: start_condition
+		]}
+])
+printEl([1_: start_condition])
+sys_search([
+	1_: fixed_: request_pattern,
+	2_: fixed_: {
+		{1_: __quest, 2_: quest}
+	},
+	3_: fixed_: {
+		{1_: _contour, 2_: start_condition}
+	}
+],,next)
+printEl([1_: quest])
+printNl([1_: /"INPUT VALUE"/])
+printEl([1_: input_value])
+sys_search([
+	1_: fixed_: start_condition,
+	3_: fixed_: {
+		{1_: quest, 2_: input_value}
+	}
+],,next)
+
+searchElStr5([
+	1_: fixed_: input_value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: req1,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 1_
+],,param0)
+searchElStr5([
+	1_: fixed_: input_value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: req2,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 2_
+],,param1)
+searchElStr5([
+	1_: fixed_: input_value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: req3,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 3_
+],,param2)
+searchElStr5([
+	1_: fixed_: input_value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: req4,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 4_
+],,param3)
+searchElStr5([
+	1_: fixed_: input_value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: req5,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 5_
+],,param4)
+searchElStr5([
+	1_: fixed_: input_value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: req6,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 6_
+],,param5)
+searchElStr5([
+	1_: fixed_: input_value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: req7,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 7_
+],,param6)
+searchElStr5([
+	1_: fixed_: input_value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: req8,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 8_
+],,param7)
+searchElStr5([
+	1_: fixed_: input_value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: req9,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 9_
+],param9,param8)
+
+
+label(param0)
+callExtReturn([
+	1_: fixed_: prog,
+	2_: {[ 1_: assign_: answer]}
+])
+printNl([1_: /"PARAM0"/],exit,exit)
+label(param1)
+callExtReturn([
+	1_: fixed_: prog,
+	2_: {[ 1_: req1, 2_: assign_: answer]}
+])
+printNl([1_: /"PARAM1"/],exit,exit)
+label(param2)
+callExtReturn([
+	1_: fixed_: prog,
+	2_: {[ 1_: req1, 2_: req2, 3_: assign_: answer]}
+])
+printNl([1_: /"PARAM2"/],exit,exit)
+label(param3)
+callExtReturn([
+	1_: fixed_: prog,
+	2_: {[ 1_: req1, 2_: req2, 3_: req3, 4_: assign_: answer]}
+])
+printNl([1_: /"PARAM3"/],exit,exit)
+label(param4)
+callExtReturn([
+	1_: fixed_: prog,
+	2_: {[ 1_: req1, 2_: req2, 3_: req3, 4_: req4, 5_: assign_: answer]}
+])
+printNl([1_: /"PARAM4"/],exit,exit)
+label(param5)
+callExtReturn([
+	1_: fixed_: prog,
+	2_: {[ 1_: req1, 2_: req2, 3_: req3, 4_: req4, 5_: req5, 6_: assign_: answer]}
+])
+printNl([1_: /"PARAM5"/],exit,exit)
+label(param6)
+callExtReturn([
+	1_: fixed_: prog,
+	2_: {[ 1_: req1, 2_: req2, 3_: req3, 4_: req4, 5_: req5, 6_: req6, 7_: assign_: answer]}
+])
+printNl([1_: /"PARAM6"/],exit,exit)
+label(param7)
+callExtReturn([
+	1_: fixed_: prog,
+	2_: {[ 1_: req1, 2_: req2, 3_: req3, 4_: req4, 5_: req5, 6_: req6, 7_: req7, 8_: assign_: answer]}
+])
+printNl([1_: /"PARAM7"/],exit,exit)
+label(param8)
+callExtReturn([
+	1_: fixed_: prog,
+	2_: {[ 1_: req1, 2_: req2, 3_: req3, 4_: req4, 5_: req5, 6_: req6, 7_: req7, 8_: req8, 9_: assign_: answer]}
+])
+printNl([1_: /"PARAM8"/],exit,exit)
+label(param9)
+callExtReturn([
+	1_: fixed_: prog,
+	2_: {[ 1_: req1, 2_: req2, 3_: req3, 4_: req4, 5_: req5, 6_: req6, 7_: req7, 8_: req8, 9_: req9, 10_: assign_: answer]}
+])
+printNl([1_: /"PARAM9"/],exit,exit)
+
+label(gen_good_result)
+genElStr3([
+	1_: fixed_: rrel_answer_is_present,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: inputarc
+],exit,exit)
+label(gen_bad_result)
+genElStr3([
+	1_: fixed_: rrel_program_is_absent,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: inputarc
+],exit,exit)
+label(exit)
+printEl([1_: answer])
+printNl([1_: exited])
+ifVarAssign([1_: set],,no_erase_set)
+eraseEl([1_: fixed_: set])
+label(no_erase_set)
+return()
+end

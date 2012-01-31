@@ -1,0 +1,85 @@
+// 
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "meta_info.scsy"
+
+procedure(search_relations,
+[[	
+	first=1_;
+	second=2_;
+	set_attr=set_;
+	fixed_attr=fixed_;
+	stype_element;	
+	
+	//#отладочная информация, закомментировать или убрать	
+	here=/"\n\nI have entered search_relations!!!\n\n"/;
+	exited=/"\n\nI have exited search_relations!!!\n\n"/;
+	found=/"\n\nI found relation!!!\n\n"/;
+	
+]],
+[{	
+	arc,arc1,node,node1,general_set,result_set,seg,segments,set,element,set4seach_relations,rel
+}],
+{[		
+	1_: in_: general_set,	
+	2_: out_: result_set
+]}
+)
+sys_get_location([1_: general_set,2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+
+//#printNl([1_: here])
+///////////////////////////////////////
+
+genEl([1_: const_: node_: assign_: result_set])
+
+searchSetStr3([
+	1_: fixed_: general_set,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node,
+	set3_: assign_: set4seach_relations
+],,exit)
+
+//перебираем элементы
+label(next)
+
+ifVarAssign([1_: element],,noerase)
+eraseElStr3([
+	1_: fixed_: set4seach_relations,
+	2_: assign_: f_: arc,
+	3_: fixed_: element
+])
+label(noerase)
+
+searchElStr3([
+	1_: fixed_: set4seach_relations,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: element
+],,exit)
+
+searchElStr3([
+	1_: fixed_: stype_bin_orient_norole_rel,
+	2_: assign_: arc,
+	3_: fixed_: element
+],found_relation_next,next)
+
+
+//элемент оказался отношением
+label(found_relation_next)
+
+//#printEl([1_:element])
+
+genElStr3([
+	1_: fixed_: result_set,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: element
+],next,next)
+
+///////////////////////////////////////
+label(exit)
+
+//#printNl([1_: exited])
+return()
+end

@@ -1,0 +1,83 @@
+
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: erase_sys_gen_result.m4scp
+// Description:
+// Файл содержит процедуру удаления результатов работы системного оператора sys_gen
+// 1-й аргумент - исходный шаблон
+// 2-й аргумент - исходные параметры
+// 3-й аргумент - результат генерации
+/////////////////////////////////////////////////////
+// 		Author: Daniil Shunkevich
+//        Date: 02.07.11
+
+#include "scp_keynodes.scsy"
+#include "lib_gen.scsy"
+
+procedure(erase_sys_gen_result,
+[[
+]],
+[{	
+	a,arc,seg,segments,temp,arc1,node,template,params,set,nodeVar,result,tempNode,arcVar
+}],
+{[
+	1_: in_: template,
+	2_: in_: params,
+	3_: in_: result
+]}
+)
+sys_get_location([1_: template, 2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg, 2_: assign_: segments])
+
+selectNStr3([
+	1_: fixed_: template,
+	2_: assign_: const_: pos_: arcVar,
+	3_: assign_: const_: tempNode,
+	set3_: fixed_: result
+])
+
+callReturn([
+	1_: fixed_: gen_relation_domain,
+	2_: fixed_: {[ 
+		1_: params,
+		2_: 2_,
+		3_: assign_: nodeVar
+	]}
+])
+selectNStr3([
+	1_: fixed_: nodeVar,
+	2_: assign_: const_: pos_: arcVar,
+	3_: assign_: const_: tempNode,
+	set3_: fixed_: result
+])
+eraseEl([1_: fixed_: nodeVar])
+eraseSetStr3([
+	1_: fixed_: f_: result,
+	2_: assign_: const_: pos_: arc_: arcVar,
+	3_: assign_: f_: nodeVar
+])
+label(exit)
+return()
+end

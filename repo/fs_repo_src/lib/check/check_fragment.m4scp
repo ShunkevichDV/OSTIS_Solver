@@ -1,0 +1,143 @@
+
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: check_fragment.m4scp
+// Description:
+// Файл содержит процедуру проверки атомарного
+// фрагмента заключения ипмликации
+// для попытки его перенесения в посылку высказывания 
+// 1-й аргумент - атомарный фрагмент
+// 2-й аргумент - множество связанных переменных 
+// фрагмента и посылки высказывания
+// 3-й аргумент - логический результат работы (истина/ложь)
+/////////////////////////////////////////////////////
+// 		Author: Daniil Shunkevich
+//        Date: 11.01.11
+
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "lib_set.scsy"
+#include "lib_search.scsy"
+#include "meta_info.scsy"
+
+procedure(check_fragment,
+[[
+	membership_pattern=[
+		__arc=(__parent->>>__child);
+		_contour->>__arc;
+		_contour->>__parent;
+		_contour->>__child;
+		_linked->>__child;
+	];
+//#	relation_pattern=[
+//#		__arc=(__parent->>>__child);
+//#		_contour->>__arc;
+//#		_contour->>__parent;
+//#		_contour->>__child;
+//#		_linked->>__child;
+//#		stype_sheaf->__parent;
+//#	];
+//#	relation_pattern=[
+//#		__arc1=(__link->>>__parent);
+//#		__arc2=(__link->>>__child);
+//#		__arc1_1=(1_->>>__arc1);
+//#		__arc2_1=(2_->>>__arc2);
+//#		_contour->>__link;
+//#		_contour->>__arc1;
+//#		_contour->>__arc2;
+//#		_contour->>__arc1_1;
+//#		_contour->>__arc2_1;
+//#		_contour->>__parent;
+//#		_contour->>__child;
+//#		_linked->>__child;
+//#	];
+	relation_pattern2=[
+		__arc=(__parent->>>__child);
+		__arc2=(__link->>>__parent);
+		__arc2_1=(_attr->>>__arc2);
+		_contour->>__arc;
+		_contour->>__arc2;
+		_contour->>__arc2_1;
+		_contour->>__link;
+		_contour->>__parent;
+		_contour->>__child;
+		_linked->>__child;
+	];
+]],
+[{	
+	arc,arc1,link1,linked,temp,node,seg,segments,bool_res,contour,linked,c_arc,attr,
+	parent
+}],
+{[
+	1_: in_: contour,
+	2_: in_: linked,
+	3_: out_: bool_res
+]}
+)
+//#nop(gen_good_result)
+sys_get_location([1_: contour,2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+
+//#searchElStr3([
+//#	1_: fixed_: contour,
+//#	2_: assign_: const_: pos_: arc,
+//#	3_: assign_: const_: node_: temp
+//#],,gen_bad_result)
+
+printNl([1_: /"CF SEARCH1"/])
+sys_search([
+	1_: fixed_: membership_pattern,
+	2_: fixed_: {
+		{1_: __arc, 2_: c_arc}, {1_: __parent, 2_: parent}
+	},
+	3_: fixed_: {
+		{1_: _contour,2_: contour}, {1_: _linked,2_: linked}
+	}
+],,gen_good_result)
+searchElStr3([
+	1_: assign_: const_: node_: attr,
+	2_: assign_: var_: pos_: arc,
+	3_: fixed_: c_arc
+],gen_good_result)
+searchElStr3([
+	1_: fixed_: linked,
+	2_: assign_: var_: pos_: arc,
+	3_: fixed_: parent
+],gen_good_result)
+
+label(membership_done)
+printNl([1_: /"CF SEARCH2"/])
+sys_search([
+	1_: fixed_: relation_pattern2,
+	3_: fixed_: {
+		{1_: _contour,2_: contour}, {1_: _linked,2_: linked}
+	}
+],,gen_bad_result)
+label(gen_good_result)
+genEl([1_: assign_: const_: node_: bool_res],exit,exit)
+label(gen_bad_result)
+label(exit)
+return()
+end

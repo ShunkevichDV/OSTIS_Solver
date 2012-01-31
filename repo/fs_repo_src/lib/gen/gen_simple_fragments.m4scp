@@ -1,0 +1,229 @@
+// 
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "lib_search.scsy"
+#include "meta_info.scsy"
+
+procedure(gen_simple_fragments,
+[[	
+	first=1_;
+	second=2_;
+	set_attr=set_;
+	fixed_attr=fixed_;
+	stype_element;	
+	
+	//#отладочна€ информаци€, закомментировать или убрать	
+	here=/"\n\nI have entered gen_simple_fragments!!!\n\n"/;
+	exited=/"\n\nI have exited gen_simple_fragments!!!\n\n"/;
+	found=/"\n\nI found node!!!\n\n"/;	
+	el_set_str=/"\n\nEL_SET!!!\n\n"/;	
+	
+]],
+[{	
+	arc,arc1,node,node1,general_set,result_set,seg,segments,set,el,element,elements_set,element_arc,relations_set,relation,sheaf_set,sheaf,sheaf_arc,attributes_set,attr,attr_arc,fragment,nodes_set,temp_arc
+}],
+{[		
+	1_: in_: general_set,	
+	2_: out_: result_set
+]}
+)
+sys_get_location([1_: general_set,2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+
+printNl([1_: here])
+
+///////////////////////////////////////
+
+genEl([1_: const_: node_: assign_: result_set])
+
+///////////////////////////////////////
+
+//#поиск узлов
+searchSetStr3([
+	1_: fixed_: general_set,
+	2_: assign_: arc,
+	3_: assign_: node_: node,	
+	set3_: assign_: nodes_set
+],,exit)
+///////////////////////////////////////
+
+//#перебираем узлы
+label(next)
+
+ifVarAssign([1_: node],,noerase)
+eraseElStr3([
+	1_: fixed_: nodes_set,
+	2_: assign_: f_: pos_: arc,
+	3_: fixed_: node
+])
+
+label(noerase)
+
+searchElStr3([
+	1_: fixed_: nodes_set,
+	2_: assign_: pos_: arc,
+	3_: assign_: node
+],,exit)
+
+///////////////////////////////////////
+
+//#поиск элементов у узла
+searchSetStr5([
+	1_: fixed_: node,
+	2_: assign_: arc,
+	3_: assign_: el,
+	4_: assign_: arc1,
+	5_: fixed_: general_set,
+	set3_: assign_: elements_set
+],,next)
+
+searchElStr3([
+	1_: fixed_: elements_set,
+	2_: assign_: arc,
+	3_: assign_: el
+],,next)
+
+//#создаем новый фрагмент только когда у узла имеетс€ хот€ бы один элемент
+searchElStr5([
+	1_: fixed_: node,
+	2_: assign_: arc,
+	3_: assign_: el,
+	4_: assign_: arc1,
+	5_: fixed_: general_set
+],,next)
+
+//#создаем новый фрагмент
+genEl([1_: const_: node_: assign_: fragment])
+
+//#добавл€ем фрагмент в результирующее множество
+genElStr3([
+	1_: fixed_: result_set,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: fragment
+])
+
+//#добавл€ем узел в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: node
+])
+
+//#перебираем элементы
+label(next2)
+
+ifVarAssign([1_: element],,noerase2)
+eraseElStr3([
+	1_: fixed_: elements_set,
+	2_: assign_: f_: arc,
+	3_: fixed_: element
+])
+
+label(noerase2)
+
+searchElStr3([
+	1_: fixed_: elements_set,
+	2_: assign_: arc,
+	3_: assign_: element
+],,next)
+
+//#находим дугу, соедин€ющую узел и элемент
+searchElStr5([
+	1_: fixed_: node,
+	2_: assign_: element_arc,
+	3_: fixed_: element,
+	4_: assign_: temp_arc,
+	5_: fixed_: general_set
+])
+
+//#добавл€ем найденную дугу в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: element_arc
+])
+
+//#удал€ем найденную дугу из входного множества
+eraseElStr3([
+	1_: fixed_: general_set,
+	2_: assign_: f_: arc,
+	3_: fixed_: element_arc
+])
+
+
+//#добавл€ем узел в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: element
+])
+
+///////////////////////////////////////
+
+callReturn([1_: fixed_: search_attributes,
+	    2_: fixed_:
+		{[
+			1_: fixed_: element_arc,
+			2_: fixed_: general_set,
+			3_: assign_: attributes_set
+		]}
+])
+
+//#перебираем атрибуты
+label(next3)
+
+ifVarAssign([1_: attr],,noerase3)
+eraseElStr3([
+	1_: fixed_: attributes_set,
+	2_: assign_: f_: arc,
+	3_: fixed_: attr
+])
+label(noerase3)
+
+searchElStr3([
+	1_: fixed_: attributes_set,
+	2_: assign_: arc,
+	3_: assign_: attr
+],,next2)
+
+//#находим дугу, соедин€ющую атрибут и дугу
+searchElStr3([
+	1_: fixed_: attr,
+	2_: assign_: attr_arc,
+	3_: fixed_: element_arc
+])
+
+//#добавл€ем найденную дугу в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: attr_arc
+])
+
+//#удал€ем найденную дугу из входного множества
+eraseElStr3([
+	1_: fixed_: general_set,
+	2_: assign_: f_: arc,
+	3_: fixed_: attr_arc
+])
+
+//#добавл€ем атрибут в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: attr
+],next3,next3)
+
+///////////////////////////////////////
+label(exit)
+printNl([1_: exited])
+ifVarAssign([1_: nodes_set],,no_erase_set1)
+eraseEl([1_: fixed_: nodes_set])
+label(no_erase_set1)
+ifVarAssign([1_: elements_set],,no_erase_set2)
+eraseEl([1_: fixed_: elements_set])
+label(no_erase_set2)
+return()
+end

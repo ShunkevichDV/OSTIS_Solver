@@ -1,0 +1,328 @@
+
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: gen_production_for_impl.m4scp
+// Description:
+// Файл содержит процедуру запуска операции
+// продукции для высказывания об импликации
+// двух атомарных высказываний
+// 1-й аргумент - исходное высказывание
+// 2-й аргумент - объект, который необходимо подставить в выказывание
+// 3-й аргумент - запрос продукции (если он сгенерирован)
+/////////////////////////////////////////////////////
+// 		Author: Daniil Shunkevich
+//        Date: 11.01.11
+
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "lib_search.scsy"
+#include "lib_other.scsy"
+#include "meta_info.scsy"
+#include "lib_system.scsy"
+#include "lib_gen.scsy"
+
+procedure(gen_production_for_impl,
+[[	
+	nrel_impl;
+	q_production;
+	search_stat_theory;
+	gen_impl_link;
+	check_impl_with_conj;
+	calc_req_pattern=[nrel_answer->>{. 1_:: _node, 2_:: _res.};_q_arc=(q_calculation->>_q_req);_node->>q_calculation;_node->>_q_arc;_node->>_q_req;];
+]],
+[{	
+	stat,arc,arc1,seg,segments,temp,arc1,value,res,left,right,res_set,node1,node2,new_right,out_res,waitarc,q_arc,q_req,theory,in_stat,
+	check_res,out_left,out_right
+}],
+{[
+	1_: in_: stat,
+	2_: in_: value,
+	3_: out_: out_res
+]}
+)
+sys_get_location([1_: stat,2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+searchElStr3([
+	1_: fixed_: nrel_impl,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: stat
+],,exit)
+printNl([1_: /"PRODUCTION IMPL entered\n Current statement"/])
+printEl([1_: stat])
+genElStr3([
+	1_: assign_: const_: node_: temp,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: value
+])
+searchElStr5([
+	1_: fixed_: stat,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: left,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 1_
+],,exit)
+callReturn([
+	1_: fixed_: gen_checking_atomic_statement_validity_request,
+	2_: fixed_:
+		{[
+			1_: fixed_: left,
+			2_: fixed_: temp,
+			3_: assign_: check_res
+		]}
+])
+eraseEl([1_: fixed_: temp])
+ifVarAssign([1_: check_res],,exit)
+
+varAssign([1_: fixed_: in_stat,2_: fixed_: stat])
+callReturn([
+	1_: fixed_: gen_private_impl_request,
+	2_: fixed_:
+		{[
+			1_: fixed_: stat,
+			2_: fixed_: value,
+			3_: assign_: stat
+		]}
+])
+ifVarAssign([1_: stat],,gen_bad_result)
+//#printNl([1_: /"STAT"/])
+//#printEl([1_: stat])
+searchElStr5([
+	1_: fixed_: stat,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: left,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 1_
+],,exit)
+//#printNl([1_: /"LEFT"/])
+//#printEl([1_: left])
+searchElStr5([
+	1_: fixed_: stat,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: right,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 2_
+],,exit)
+//#printNl([1_: /"RIGHT"/])
+//#printEl([1_: right])
+searchElStr3([
+	1_: fixed_: right,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: temp
+],,gen_bad_result)
+
+/////////////////////////////////////////////////////
+// production generation start
+genElStr3([
+	1_: assign_: node_: const_: res,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: node2,
+],,exit)
+genElStr3([
+	1_: fixed_: res,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: stat,
+],,exit)
+genElStr3([
+	1_: fixed_: node2,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: value,
+],,exit)
+genElStr3([
+	1_: fixed_: q_production,
+	2_: assign_: const_: pos_: waitarc,
+	3_: fixed_: res,
+],,exit)
+genElStr3([
+	1_: fixed_: question,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: res
+],,exit)
+
+callReturn([1_: fixed_: enable_arifmetic_processor,
+		2_: fixed_:
+		{[
+		]}
+])
+
+genElStr3([
+	1_: fixed_: q_initiated,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: res
+],,exit)
+
+label(wait)
+sys_wait([
+	1_: fixed_: catch_input_arc,
+	2_: fixed_: {1_: waitarc}
+])
+searchElStr5([
+	1_: fixed_: q_production,
+	2_: fixed_: waitarc,
+	3_: fixed_: res,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: rrel_answer_is_absent
+],gen_bad_result)
+searchElStr5([
+	1_: fixed_: q_production,
+	2_: fixed_: waitarc,
+	3_: fixed_: res,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: rrel_answer_is_present
+],,wait)
+
+sys_search([
+	1_: fixed_: calc_req_pattern,
+	2_: fixed_: {
+		{1_: _q_arc, 2_: assign_: q_arc}, {1_: _q_req, 2_: assign_: q_req}
+	},
+	3_: fixed_: {
+		{1_: _res, 2_: res}
+	}
+])
+searchElStr5([
+	1_: fixed_: q_calculation,
+	2_: fixed_: q_arc,
+	3_: fixed_: q_req,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: rrel_answer_is_absent
+],gen_bad_result)
+searchElStr5([
+	1_: fixed_: q_calculation,
+	2_: fixed_: q_arc,
+	3_: fixed_: q_req,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: rrel_answer_is_present
+],gen_good_result)
+label(wait2)
+sys_wait([
+	1_: fixed_: catch_input_arc,
+	2_: fixed_: {1_: q_arc}
+])
+searchElStr5([
+	1_: fixed_: q_calculation,
+	2_: fixed_: q_arc,
+	3_: fixed_: q_req,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: rrel_answer_is_absent
+],gen_bad_result)
+searchElStr5([
+	1_: fixed_: q_calculation,
+	2_: fixed_: q_arc,
+	3_: fixed_: q_req,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: rrel_answer_is_present
+],gen_good_result,wait2)
+label(gen_good_result)
+printNl([1_: /"IMPL was genered for statement:"/])
+printEl([1_: in_stat])
+genElStr3([
+	1_: fixed_: nrel_successful_production,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: temp,
+])
+genElStr5([
+	1_: fixed_: temp,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: node2,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 1_
+])
+genElStr5([
+	1_: fixed_: temp,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: in_stat,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 2_
+])
+//Generating solution link
+
+//#genEl([1_: assign_: const_: node_: out_res],exit,exit)
+genElStr3([
+	1_: fixed_: nrel_logic_consequence_modus_ponens,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: out_res
+])
+genElStr3([
+	1_: fixed_: stype_sheaf,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: out_res
+])
+genElStr5([
+	1_: fixed_: out_res,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: out_left,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 1_
+])
+
+//Adding const right part
+searchElStr5([
+	1_: fixed_: q_req,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: out_right,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: rrel_expression_is_substituted
+])
+genElStr5([
+	1_: fixed_: out_res,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: out_right,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 2_
+])
+
+genElStr3([
+	1_: fixed_: out_left,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: in_stat
+])
+genElStr3([
+	1_: fixed_: out_left,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: value
+])
+
+eraseSetStr3([
+	1_: fixed_: f_: stat,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: f_: temp
+],exit,exit)
+label(gen_bad_result)
+printNl([1_: /"IMPL can't be genered!"/])
+ifVarAssign([1_: stat],,exit)
+eraseSetStr3([
+	1_: fixed_: f_: stat,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: f_: temp
+],exit,exit)
+label(exit)
+callReturn([1_: fixed_: disable_arifmetic_processor,
+		2_: fixed_:
+		{[
+		]}
+])
+return()
+end

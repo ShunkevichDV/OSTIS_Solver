@@ -1,0 +1,407 @@
+
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: gen_private_impl.m4scp
+// Description: File contains operation to generate private peoducyion from 
+// general production. That means that part of right side will be brought to left side
+/////////////////////////////////////////////////////
+// 		Author: Daniil Shunkevich
+//        Date: 10.03.11
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "lib_search.scsy"
+#include "lib_other.scsy"
+#include "lib_check.scsy"
+#include "lib_set.scsy"
+#include "lib_gen.scsy"
+#include "lib_answer.scsy"
+
+program(init_op,
+[[	
+	//#q_var_value;
+	q_initiated;
+	catch_output_arc;
+//#	here=/"\n\nHandler setted!\n\n"/;
+]],
+[{
+	nodeVar
+}],
+{[
+]}
+)
+
+sys_set_event_handler([
+	1_: fixed_: catch_output_arc,
+	2_: fixed_: gen_private_impl,
+	3_: fixed_: {1_: q_initiated},
+	4_: assign_: nodeVar
+])
+
+return()
+end
+
+procedure(gen_private_impl,
+[[
+	here=/"\n\nI have entered GENERATE PRIVATE IMPL\n\n"/;
+	exited=/"\n\nI have exited GENERATE PRIVATE IMPL\n\n"/;
+]],
+[{	
+	inputarc,arc,arc1,value,handler,element,seg,segments,temp,temp1,attr,v_v_arc,answer,input_value,left,right,
+	conj_set,conj_elem,conj_arc,params,map,linked,res_map,out_sys_search,check_res,res_set,temp2
+}],
+{[
+	1_: in_: handler,
+	2_: in_: element,
+	3_: in_: inputarc,
+	4_: in_: input_value
+]}
+)
+sys_get_location([1_: input_value,2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+
+searchElStr3([
+	1_: fixed_: q_gen_private_impl,
+	2_: assign_: const_: pos_: v_v_arc,
+	3_: fixed_: input_value
+],,exit)
+searchElStr3([
+	1_: assign_: const_: pos_: attr,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: v_v_arc
+],exit)
+searchElStr5([
+	1_: fixed_: input_value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: value,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 1_
+],,exit)
+searchElStr5([
+	1_: fixed_: input_value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: params,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 2_
+],,exit)
+printNl([1_: here])
+callReturn([1_: fixed_: gen_impl_link_copy,
+	    2_: fixed_:
+		{[
+			1_: fixed_: value,
+			2_: assign_: value
+		]}
+])
+searchElStr5([
+	1_: fixed_: value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: left,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 1_
+],,gen_bad_answer)
+searchElStr5([
+	1_: fixed_: value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: right,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 2_
+],,gen_bad_answer)
+
+searchElStr3([
+	1_: fixed_: nrel_conj,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: right
+],,no_conj)
+
+label(left_cycle)
+ifVarAssign([1_: map],,no_erase_map0)
+eraseSetStr3([
+	1_: fixed_: f_: map,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: f_: temp
+])
+label(no_erase_map0)
+
+//////////////////////////////////////////////////////////////////////////////////////
+// Mapping
+callReturn([1_: fixed_: search_direct_mapping,
+	    2_: fixed_:
+		{[
+			1_: fixed_: left,
+			2_: fixed_: params,
+			3_: assign_: map
+		]}
+])
+ifVarAssign([1_: map],,gen_bad_answer)
+//#printNl([1_: /"MAP IS GOOD"/])
+//////////////////////////////////////////////////////////////////////////////////////
+// Conj cycle
+searchSetStr3([
+	1_: fixed_: right,
+	2_: assign_: pos_: const_: arc,
+	3_: assign_: const_: node_: temp,
+	set3_: assign_: conj_set
+])
+
+label(next_conj_elem)
+ifVarAssign([1_: conj_arc],,no_erase_conj)
+eraseEl([1_: conj_arc])
+label(no_erase_conj)
+ifVarAssign([1_: linked],,no_erase_linked)
+eraseEl([1_: linked])
+label(no_erase_linked)
+ifVarAssign([1_: res_map],,no_erase_res_map)
+eraseSetStr3([
+	1_: fixed_: f_: res_map,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: f_: temp
+])
+label(no_erase_res_map)
+
+searchElStr3([
+	1_: fixed_: conj_set,
+	2_: assign_: const_: pos_: conj_arc,
+	3_: assign_: const_: node_: conj_elem
+],,conj_cycle_end)
+
+callReturn([1_: fixed_: search_linked_nodes,
+	    2_: fixed_:
+		{[
+			1_: fixed_: left,
+			2_: fixed_: conj_elem,
+			3_: assign_: linked 
+		]}
+])
+ifVarAssign([1_: linked],,next_conj_elem)
+searchElStr3([
+	1_: fixed_: linked,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: var_: temp
+],,next_conj_elem)
+/////////////////////////////////////////////////////////
+//#Checking Fragment
+callReturn([
+	1_: fixed_: check_fragment,
+	2_: fixed_:
+		{[
+			1_: fixed_: conj_elem,
+			2_: fixed_: linked,
+			3_: assign_: check_res
+		]}
+])
+ifVarAssign([1_: check_res],,next_conj_elem)
+eraseEl([1_: fixed_: f_: check_res])
+
+//#eraseSetStr3([
+//#	1_: fixed_: conj_elem,
+//#	2_: assign_: var_: pos_: f_: arc,
+//#	3_: assign_: temp2
+//#])
+
+callReturn([1_: fixed_: search_inverse_mapping,
+	    2_: fixed_:
+		{[
+			1_: fixed_: left,
+			2_: fixed_: linked,
+			3_: fixed_: map,
+			4_: assign_: res_map
+		]}
+])
+ifVarAssign([1_: res_map],,next_conj_elem)
+
+
+printNl([1_: /"GPI SEARCH"/])
+sys_search([
+	1_: fixed_: conj_elem,
+	3_: fixed_: res_map
+],,next_conj_elem,next_conj_elem)
+
+//#printNl([1_: /"CONJ_ELEM"/])
+//#printEl([1_: conj_elem])
+
+callReturn([
+	1_: fixed_: set_unite_to_first,
+	2_: fixed_:
+		{[
+			1_: fixed_: left,
+			2_: fixed_: conj_elem
+		]}
+])
+eraseEl([1_: conj_elem],left_cycle,left_cycle)
+
+label(conj_cycle_end)
+searchElStr3([
+	1_: fixed_: right,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: temp
+],,gen_bad_answer)
+//#callReturn([
+//#	1_: fixed_: check_fragments_set,
+//#	2_: fixed_:
+//#		{[
+//#			1_: fixed_: left,
+//#			2_: fixed_: right,
+//#			3_: assign_: check_res
+//#		]}
+//#])
+//#ifVarAssign([1_: check_res],,gen_bad_answer)
+
+callReturn([1_: fixed_: gen_conjunction_union,
+	    2_: fixed_:
+		{[
+			1_: fixed_: right,
+			2_: assign_: right
+		]}
+])
+
+searchElStr5([
+	1_: fixed_: value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: temp,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 2_
+])
+genElStr5([
+	1_: fixed_: value,
+	2_: fixed_: arc,
+	3_: fixed_: right,
+	4_: fixed_: arc1,
+	5_: fixed_: 2_
+])
+eraseSetStr3([
+	1_: fixed_: f_: temp,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: f_: temp1
+])
+label(no_conj)
+callReturn([1_: fixed_: search_direct_mapping,
+	    2_: fixed_:
+		{[
+			1_: fixed_: left,
+			2_: fixed_: params,
+			3_: assign_: map
+		]}
+])
+ifVarAssign([1_: map],,gen_bad_answer)
+callReturn([1_: fixed_: search_linked_nodes,
+	    2_: fixed_:
+		{[
+			1_: fixed_: left,
+			2_: fixed_: right,
+			3_: assign_: linked 
+		]}
+])
+ifVarAssign([1_: linked],,gen_bad_answer)
+printNl([1_: /"LINKED"/])
+printEl([1_: linked])
+callReturn([1_: fixed_: search_inverse_mapping,
+	    2_: fixed_:
+		{[
+			1_: fixed_: left,
+			2_: fixed_: linked,
+			3_: fixed_: map,
+			4_: assign_: res_map
+		]}
+])
+ifVarAssign([1_: res_map],,gen_bad_answer)
+
+printNl([1_: /"GPI SEARCH"/])
+sys_search([
+	1_: fixed_: right,
+	3_: fixed_: res_map
+],gen_bad_answer,,gen_bad_answer)
+
+genElStr3([
+	1_: assign_: node_: const_: answer,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: value
+])
+
+callReturn([
+	1_:	fixed_: answer_make,
+	2_:	fixed_: {[
+			1_: input_value,
+			2_: answer
+		]}
+	]
+)
+
+label(gen_good_answer)
+ifVarAssign([1_: map],,no_erase_map1)
+eraseSetStr3([
+	1_: fixed_: f_: map,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: f_: temp
+])
+label(no_erase_map1)
+ifVarAssign([1_: linked],,no_erase_linked1)
+eraseEl([1_: linked])
+label(no_erase_linked1)
+ifVarAssign([1_: res_map],,no_erase_res_map1)
+eraseSetStr3([
+	1_: fixed_: f_: res_map,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: f_: temp
+])
+label(no_erase_res_map1)
+genElStr3([
+	1_: fixed_: rrel_answer_is_present,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: v_v_arc
+],exit,exit)
+label(gen_bad_answer)
+ifVarAssign([1_: map],,no_erase_map2)
+eraseSetStr3([
+	1_: fixed_: f_: map,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: f_: temp
+])
+label(no_erase_map2)
+ifVarAssign([1_: linked],,no_erase_linked2)
+eraseEl([1_: linked])
+label(no_erase_linked2)
+ifVarAssign([1_: res_map],,no_erase_res_map2)
+eraseSetStr3([
+	1_: fixed_: f_: res_map,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: f_: temp
+])
+label(no_erase_res_map2)
+genElStr3([
+	1_: fixed_: rrel_answer_is_absent,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: v_v_arc
+],exit,exit)
+
+label(exit)
+printNl([1_: exited])
+ifVarAssign([1_: conj_set],,no_erase_set)
+eraseEl([1_: fixed_: conj_set])
+label(no_erase_set)
+ifVarAssign([1_: check_res],,no_erase_res)
+eraseEl([1_: fixed_: check_res])
+label(no_erase_res)
+return()
+end

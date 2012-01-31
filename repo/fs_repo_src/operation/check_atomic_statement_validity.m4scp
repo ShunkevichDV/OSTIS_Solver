@@ -1,0 +1,733 @@
+
+
+/* -----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2011 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modfirst_ely
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  first_el not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: check_atomic_statement_validity.m4scp
+// Description: Файл содержит операцию доказательства 
+//              истинности атомарного высказывания
+/////////////////////////////////////////////////////
+// 		Author: Sergei Zalivako
+//        Date: 14.06.2011 
+
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "lib_search.scsy"
+#include "lib_system.scsy"
+#include "lib_erase.scsy"
+#include "lib_other.scsy"
+#include "lib_gen.scsy"
+#include "lib_set.scsy"
+#include "lib_answer.scsy"
+#include "lib_other.scsy"
+
+program(init_op,
+[[
+	// Вызываемая SCP-программа
+	check_atomic_statement_validity;	
+	// Ключевой узел, обозначающий инициированный вопрос
+	q_initiated;
+	// Событие, на которое реагирует обработчик(проведение выходящей дуги из узла)
+	catch_output_arc;
+]],
+[{
+}],
+{[
+]}
+)
+// Установка обработчика события на проведение дуги  из узла "запрос истинности атомарного высказывания" 
+sys_set_event_handler([
+	1_: fixed_: catch_output_arc,
+	2_: fixed_: check_atomic_statement_validity,
+	3_: fixed_: {1_: q_initiated}
+])
+
+return()
+end
+
+procedure(check_atomic_statement_validity,
+[[
+	// Узел, обозначающий "запрос истинности атомарного высказывания"
+	q_atomic_statement_validity;
+	
+	// Класс арифметических отношений
+	group_arifmetic_relation;
+	
+	// Процедура для удаления множества из контура
+	erase_from_contour;
+	
+	// Процедура для удаления одиночных узлов из контура
+	erase_single_nodes_from_contour;
+	
+	// Процедура для поиска соответствий по шаблону
+	search_full_mapping;
+	
+	// Шаблон поиска связок арифметических отношений
+	arifmetic_relation_pattern = [
+		__arc = (_relation ->>> __link);
+		__arcToMembers = (__link ->>> __member);
+		__arcFromAttribute = (_atribute ->>> __arcToMembers);
+		_contour ->> _relation;
+		_contour ->> __arc;
+		_contour ->> __link;
+		_contour ->> __arcToMembers;
+		_contour ->> __member;
+		_contour ->> __arcFromAttribute;
+		_contour ->> _atribute;
+		group_arifmetic_relation ->> _relation;
+	];
+	
+	// Шаблон для поиска арифметических отношений без атрибутов
+	arifmetic_relation_pattern_without_attributes = [
+		__arc = (_relation ->>> __link);
+		__arcToMembers = (__link ->>> __member);
+		_contour ->> _relation;
+		_contour ->> __arc;
+		_contour ->> __link;
+		_contour ->> __arcToMembers;
+		_contour ->> __member;
+		group_arifmetic_relation ->> _relation;
+	];
+	
+]],
+[{
+	handler, element, arcFromQuestion, questionNode, arcFromRequest,
+	arcVar, location, segments, scElement, attributeArc, arc,
+	nodeVar, tempNode,
+	statement, statementCopy, statement1,
+	arifmeticLinks, arifmeticArcs, arifmeticRelations, 
+	arcsToMembers, arcsFromAttribute, arcsToAdditional,
+	members, currentMember, additional, setForSubstitution,
+	correspondencesSet, currentCorrespondence, mappingResult,
+	formula, calculationResult, answer
+}],
+{[
+	1_: in_: handler, 
+	2_: in_: element, 
+	3_: in_: arcFromQuestion, 
+	4_: in_: questionNode
+]}
+)
+
+// Получение сегмента, в котором находится узел вопроса
+sys_get_location([
+	1_: fixed_: questionNode,
+	2_: assign_: location
+])
+
+// Установка найденного сегмента как основного
+sys_set_default_segment([
+	1_: fixed_: location
+])
+
+// Разворачивание установленного сегмента
+sys_spin_segment([
+	1_: fixed_: location,
+	2_: assign_: segments
+])
+
+// Проверяем, что в узел запроса проведена дуга из узла "запрос истинности атомарного высказывания"
+searchElStr3([
+	1_: fixed_: q_atomic_statement_validity,
+	2_: assign_: const_: pos_: arc_: arcFromRequest,
+	3_: fixed_: questionNode
+], , finishOperation)
+
+// Находим атомарное высказывание, истинность которого необходимо установить
+searchElStr5([
+	1_: fixed_: questionNode,
+	2_: assign_: const_: pos_: arc_: arcVar,
+	3_: assign_: const_: node_: statement,
+	4_: assign_: const_: pos_: arc_: attributeArc,
+	5_: fixed_: 1_
+], , finishOperation)
+
+// Находим множество объектов, которые необходимо подставить в формулу
+searchElStr5([
+	1_: fixed_: questionNode,
+	2_: assign_: const_: pos_: arc_: arcVar,
+	3_: assign_: const_: node_: setForSubstitution,
+	4_: assign_: const_: pos_: arc_: attributeArc,
+	5_: fixed_: 2_
+], , finishOperation)
+
+printNl([
+	1_: fixed_: /"Operation : Check atomic statement validity"/
+])
+
+printNl([
+	1_: fixed_: /"State : Started"/
+])
+
+// Делаем копию атомарного высказывания
+searchSetStr3([
+	1_: fixed_: statement,
+	2_: assign_: const_: pos_: arc_: arcVar,
+	3_: assign_: scElement, 
+	set3_: assign_: const_: node_: statementCopy
+])
+
+printEl([1_: statementCopy])
+
+// По шаблону находим все связки арифметических отношений в формуле
+sys_search([
+	1_: fixed_: arifmetic_relation_pattern,
+	2_: fixed_: {
+		{ 1_: __link, 2_: assign_: set_: arifmeticLinks },
+		{ 1_: __arc, 2_: assign_: set_: arifmeticArcs },
+		{ 1_: _relation, 2_: assign_: set_: arifmeticRelations },
+		{ 1_: __arcToMembers, 2_: assign_: set_: arcsToMembers },
+		{ 1_: __arcFromAttribute, 2_: assign_: set_: arcsFromAttribute },
+		{ 1_: __member, 2_: assign_: set_: members }
+	},
+	3_: fixed_: {
+		{ 1_: _contour, 2_: statementCopy }
+	}
+], , arifmeticRelationsWithoutAtrributesDeletion)
+
+nop(successResult)
+
+// Удаляем связки арифметических отношений из высказывания
+callReturn([
+	1_: fixed_: erase_from_contour,
+    2_: fixed_: {
+		[ 
+			1_: statementCopy, 
+			2_: arifmeticLinks
+		]
+	}
+])
+
+// Удаляем множество связок арифметических отношений
+eraseEl([
+	1_: fixed_: f_: arifmeticLinks
+])
+
+// Удаляем арифметические отношения из высказывания
+callReturn([
+	1_: fixed_: erase_from_contour,
+    2_: fixed_: {
+		[ 
+			1_: statementCopy, 
+			2_: arifmeticRelations
+		]
+	}
+])
+
+// Удаляем множество арифметических отношений
+eraseEl([
+	1_: fixed_: f_: arifmeticRelations
+])
+
+// Удаляем дуги, идущие от арифметических отношений к их связкам из высказывания
+callReturn([
+	1_: fixed_: erase_from_contour,
+    2_: fixed_: {
+		[ 
+			1_: statementCopy, 
+			2_: arifmeticArcs
+		]
+	}
+])
+
+// Удаляем множество дуг от арифметических отношений к их связкам
+eraseEl([
+	1_: fixed_: f_: arifmeticArcs
+])
+
+// Удаляем дуги, идущие от связок арифметических отношений к их элементам из высказывания
+callReturn([
+	1_: fixed_: erase_from_contour,
+    2_: fixed_: {
+		[ 
+			1_: statementCopy, 
+			2_: arcsToMembers
+		]
+	}
+])
+
+// Удаляем множество дуг, идущих от связок арифметических отношений к их элементам из высказывания
+eraseEl([
+	1_: fixed_: f_: arcsToMembers
+])
+
+// Удаляем дуги, идущие от атрибута к дугам принадлежности связкам арифметического отношения
+callReturn([
+	1_: fixed_: erase_from_contour,
+    2_: fixed_: {
+		[ 
+			1_: statementCopy, 
+			2_: arcsFromAttribute
+		]
+	}
+])
+
+// Удаляем множество дуг, идущих от атрибута к дугам принадлежности связкам арифметического отношения
+eraseEl([
+	1_: fixed_: f_: arcsFromAttribute
+])
+
+// Проверяем, что нашелся хотя бы один элемент связок арифметических отношений
+ifVarAssign([
+	1_: members
+], , noArifmeticLinks)
+
+// Удаляем слагаемые или множители, если они есть в высказывании
+label(arifmeticElementsDeletion)
+	
+	// Находим очередной элемент связок арифметических отношений
+	searchElStr3([
+		1_: fixed_: members,
+		2_: assign_: const_: pos_: arc_: arcVar,
+		3_: assign_: node_: currentMember
+	], , arifmeticRelationsWithoutAtrributesDeletion)
+	
+	// Удаляем дугу к найденному элементу связок
+	eraseEl([
+		1_: fixed_: f_: arcVar
+	])
+	
+	// Находим дугу к слагаемому или множителю в контуре
+	searchElStr5([
+		1_: fixed_: currentMember,
+		2_: assign_: arc_: arcVar,
+		3_: assign_: node_: additional,
+		4_: assign_: const_: pos_: arc_: attributeArc,
+		5_: fixed_: statementCopy
+	], , arifmeticElementsDeletion)
+	
+	// Удаляем найденную дугу из контура
+	eraseEl([
+		1_: fixed_: f_: attributeArc
+	], arifmeticElementsDeletion, arifmeticElementsDeletion)
+	
+// Удаляем арифметические отношения без атрибутов
+label(arifmeticRelationsWithoutAtrributesDeletion)
+	
+	// Находим по шаблону все арифметические отношения без атрибутов
+	sys_search([
+		1_: fixed_: arifmetic_relation_pattern_without_attributes,
+		2_: fixed_: {
+			{ 1_: __link, 2_: assign_: set_: arifmeticLinks },
+			{ 1_: __arc, 2_: assign_: set_: arifmeticArcs },
+			{ 1_: _relation, 2_: assign_: set_: arifmeticRelations },
+			{ 1_: __arcToMembers, 2_: assign_: set_: arcsToMembers }
+		},
+		3_: fixed_: {
+			{ 1_: _contour, 2_: statementCopy }
+		}
+	], , noArifmeticLinks)
+	
+	// Удаляем связки арифметических отношений из высказывания
+	callReturn([
+		1_: fixed_: erase_from_contour,
+		2_: fixed_: {
+			[ 
+				1_: statementCopy, 
+				2_: arifmeticLinks
+			]
+		}
+	])
+
+	// Удаляем множество связок арифметических отношений
+	eraseEl([
+		1_: fixed_: f_: arifmeticLinks
+	])
+
+	// Удаляем арифметические отношения из высказывания
+	callReturn([
+		1_: fixed_: erase_from_contour,
+		2_: fixed_: {
+			[ 
+				1_: statementCopy, 
+				2_: arifmeticRelations
+			]
+		}
+	])
+
+	// Удаляем множество арифметических отношений
+	eraseEl([
+		1_: fixed_: f_: arifmeticRelations
+	])
+
+	// Удаляем дуги, идущие от арифметических отношений к их связкам из высказывания
+	callReturn([
+		1_: fixed_: erase_from_contour,
+		2_: fixed_: {
+			[ 
+				1_: statementCopy, 
+				2_: arifmeticArcs
+			]
+		}
+	])
+
+	// Удаляем множество дуг от арифметических отношений к их связкам
+	eraseEl([
+		1_: fixed_: f_: arifmeticArcs
+	])
+
+	// Удаляем дуги, идущие от связок арифметических отношений к их элементам из высказывания
+	callReturn([
+		1_: fixed_: erase_from_contour,
+		2_: fixed_: {
+			[ 
+				1_: statementCopy, 
+				2_: arcsToMembers
+			]
+		}
+	])
+
+	// Удаляем множество дуг, идущих от связок арифметических отношений к их элементам из высказывания
+	eraseEl([
+		1_: fixed_: f_: arcsToMembers
+	])
+
+// Удаляем узлы в контуре, к которым и из которых не идут дуги принадлежности
+label(singleNodesDeletion)
+
+	// Проверяем множество слагаемых или множителей
+	ifVarAssign([
+		1_: members
+	], , withoutMembersDeletion)
+
+	// Удаляем множество найденных элементов связок
+	eraseEl([
+		1_: fixed_: members
+	])
+	
+	// Продолжаем удаление без удаление слагаемых или множителей
+	label(withoutMembersDeletion)
+	
+	// Удаляем "одиночные" узлы из контура
+	callReturn([
+		1_: fixed_: erase_single_nodes_from_contour,
+		2_: fixed_: {
+			[ 
+				1_: statementCopy
+			]
+		}
+	])
+
+// Если не найдено ни одной связки арифметического отношения или они уже удалены
+label(noArifmeticLinks)
+
+	// Находим множество соответствий для обработанного атомарного высказывания
+	callReturn([
+		1_: fixed_: search_full_mapping,
+		2_: fixed_: {
+			[ 
+				1_: statementCopy,
+				2_: setForSubstitution,
+				3_: correspondencesSet
+			]
+		}
+	])
+	
+	// Просмотр всех найденных соответствий
+	label(correspondencesView)
+		// Находим очередное множество соответствий
+		searchElStr3([
+			1_: fixed_: correspondencesSet,
+			2_: assign_: const_: pos_: arc_: arcVar,
+			3_: assign_: node_: const_: currentCorrespondence
+		], , notSuccessResult)
+		
+		// Удаляем дугу в найденное множество соответствий
+		eraseEl([
+			1_: fixed_: arcVar
+		])
+		
+		//#printNl([1_: /"ELEMENT"/])
+		//#callReturn([
+//#			1_: fixed_: print_sys_search,
+//#			2_: fixed_: {[
+//#				1_: fixed_: currentCorrespondence
+//#			]}
+		//#])	
+		
+		callReturn([
+			1_: fixed_: set_cantorize,
+			2_: fixed_: {[
+				1_: fixed_: statement,
+				2_: assign_: statement1
+			]}
+		])
+		
+		// Генерируем формулу для расчета
+		sys_gen([
+			1_: fixed_: statement1,
+			3_: fixed_: currentCorrespondence,
+			4_: assign_: const_: node_: formula
+		])
+
+callReturn([1_: fixed_: enable_arifmetic_processor,
+		2_: fixed_:
+		{[
+		]}
+])	
+		// Инициируем операцию вычисления формулы
+		callReturn([
+			1_: fixed_: call_arifmetic_interpreter,
+			2_: fixed_: {
+				[ 
+					1_: formula,
+					2_: calculationResult
+				]
+			}
+		])
+		
+						
+callReturn([1_: fixed_: disable_arifmetic_processor,
+		2_: fixed_:
+		{[
+		]}
+])
+		
+		// Проверяем успешность выполнения операции
+		ifVarAssign([
+			1_: calculationResult
+		], successResult)
+		
+		
+		// Удаляем найденную формулу в случае неуспешного завершения операции вычисления
+		callReturn([
+			1_: fixed_: erase_sys_gen_result,
+			2_: fixed_: {
+				[ 
+					1_: statement1,
+					2_: currentCorrespondence,
+					3_: formula
+				]
+			}
+		], correspondencesView, correspondencesView)
+		
+// Генерация ответа в случае успешного завершения операции
+label(successResult)
+
+	printNl([
+		1_: fixed_: /"Operation : Check atomic statement validity"/
+	])
+
+	printNl([
+		1_: fixed_: /"State : Good result"/
+	])
+
+	// Генерируем факт присутствия ответа
+	genElStr5([
+		1_: fixed_: q_atomic_statement_validity,
+		2_: fixed_: arcFromRequest,
+		3_: fixed_: questionNode,
+		4_: assign_: arc_: const_: pos_: actual_: attributeArc,
+		5_: fixed_: rrel_answer_is_present
+	])
+
+	// Генерируем узел для вывода ответа
+	genEl([
+		1_: assign_: const_: node_: answer
+	])
+	
+	// Добавляем в ответ узел "присутствует ответ_"
+	genElStr3([
+		1_: fixed_: answer,
+		2_: assign_: const_: pos_: arc_: arcVar,
+		3_: fixed_: rrel_answer_is_present
+	], exit, exit)
+	
+// Генерация ответа в случае неуспешного завершения операции
+label(notSuccessResult)
+
+	printNl([
+		1_: fixed_: /"Operation : Check atomic statement validity"/
+	])
+
+	printNl([
+		1_: fixed_: /"State : Bad result"/
+	])
+
+	// Генерируем факт отсутствия ответа
+	genElStr5([
+		1_: fixed_: q_atomic_statement_validity,
+		2_: fixed_: arcFromRequest,
+		3_: fixed_: questionNode,
+		4_: assign_: arc_: const_: pos_: actual_: attributeArc,
+		5_: fixed_: rrel_answer_is_absent
+	])
+	
+	// Генерируем узел для вывода ответа
+	genEl([
+		1_: assign_: const_: node_: answer
+	])
+	
+	// Добавляем в ответ узел "отсутствует ответ_"
+	genElStr3([
+		1_: fixed_: answer,
+		2_: assign_: const_: pos_: arc_: arcVar,
+		3_: fixed_: rrel_answer_is_absent
+	], exit, exit)
+
+label(exit)
+	
+	// Добавляем в ответ узел запроса 
+	genElStr3([
+		1_: fixed_: answer,
+		2_: assign_: const_: pos_: arc_: arcVar,
+		3_: fixed_: q_atomic_statement_validity
+	])
+	
+	// Добавляем в ответ дугу из узла запроса
+	genElStr3([
+		1_: fixed_: answer,
+		2_: assign_: const_: pos_: arc_: arcVar,
+		3_: fixed_: arcFromRequest
+	])
+	
+	// Добавляем в ответ связку запроса 
+	genElStr3([
+		1_: fixed_: answer,
+		2_: assign_: const_: pos_: arc_: arcVar,
+		3_: fixed_: questionNode
+	])
+	
+	// Добавляем в ответ дугу из узла "присутствует ответ_" или из узла "отсутствует ответ_"
+	genElStr3([
+		1_: fixed_: answer,
+		2_: assign_: const_: pos_: arc_: arcVar,
+		3_: fixed_: attributeArc
+	])
+	
+	// Генерация ответа операции
+	callReturn([
+		1_:	fixed_: answer_make,
+		2_:	fixed_: {[
+			1_: questionNode,
+			2_: answer
+		]}
+	])
+				
+// Завершаем работу операции в случае, если задан не тот вопрос или вопрос некорректен
+label(finishOperation)
+
+return()
+	
+end
+
+procedure(call_arifmetic_interpreter,
+[[
+	// Ключевой узел, обозначающий запрос вычисления формулы
+	q_calculation;
+	
+	// Ключевой узел, обозначающий инициированный вопрос
+	q_initiated;
+	
+	// Ключевой узел, обозначающий вопрос
+	question;
+	
+	// Атрибут, обозначающий, что выражение подставлено в формулу
+	rrel_expression_is_substituted;
+	
+	// Атрибут присутствия ответа
+	rrel_answer_is_present;
+	
+	// Атрибут отсутствия ответа
+	rrel_answer_is_absent;
+]],
+[{
+	arcVar, questionNode, arifmeticLink,
+	isSuccess, arc, attributeArc, arcForWaiting, formula
+}],
+{[
+	1_: in_: formula,
+	2_: out_: isSuccess
+]}
+)
+
+// Инициируем выполнение операции вычисления формулы
+// Проводим дугу из запроса
+genElStr3([
+	1_: fixed_: q_calculation,
+	2_: assign_: arc_: const_: pos_: actual_: arcForWaiting,
+	3_: assign_: const_: node_: questionNode
+])
+		
+// Генерируем дугу из вопроса в формулу с атрибутом "выражение подставлено_"
+genElStr5([
+	1_: fixed_: questionNode,
+	2_: assign_: arc_: const_: pos_: actual_: arcVar,
+	3_: fixed_: formula,
+	4_: assign_: arc_: const_: pos_: actual_: attributeArc,
+	5_: fixed_: rrel_expression_is_substituted
+])
+
+// Проводим дугу из узла "вопрос"
+genElStr3([
+	1_: fixed_: question,
+	2_: assign_: arc_: const_: pos_: actual_: arcVar,
+	3_: fixed_: questionNode
+])
+
+// Проводим дугу из узла "инициированный вопрос"
+genElStr3([
+	1_: fixed_: q_initiated,
+	2_: assign_: arc_: const_: pos_: actual_: arcVar,
+	3_: fixed_: questionNode
+])
+		
+// Ждем пока инициированная операция завершиться
+label(waitingForOperation)
+
+	sys_wait([
+		1_: fixed_: catch_input_arc,
+		2_: fixed_: {1_: arcForWaiting}
+	])
+	
+	// Ищем атрибут "присутствует ответ_"
+	searchElStr5([
+		1_: fixed_: q_calculation,
+		2_: fixed_: arcForWaiting,
+		3_: fixed_: questionNode,
+		4_: assign_: arc_: const_: pos_: actual_: arcVar,
+		5_: fixed_: rrel_answer_is_present
+	], success)
+	
+	// Ищем атрибут "отсутсвует ответ_"
+	searchElStr5([
+		1_: fixed_: q_calculation,
+		2_: fixed_: arcForWaiting,
+		3_: fixed_: questionNode,
+		4_: assign_: arc_: const_: pos_: actual_: arcVar,
+		5_: fixed_: rrel_answer_is_absent
+	], exit, waitingForOperation)
+
+// Успешное завершение операции вычисления формулы
+label(success)
+	
+	// Генерируем признак успешного завершения операции	
+	genEl([
+		1_: assign_: node_: const_: isSuccess
+	])
+
+// Безуспешное завершение операции вычисления формулы
+label(exit)		
+return()
+	
+end

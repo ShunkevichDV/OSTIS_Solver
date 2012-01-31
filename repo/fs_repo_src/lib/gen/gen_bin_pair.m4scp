@@ -1,0 +1,106 @@
+
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: gen_bin_pair_end.m4scp
+// Description: Файл содержит процедуру генерации связки отношения
+//              между двумя узлами
+/////////////////////////////////////////////////////
+// 		Author: Sergei Zalivako
+//        Date: 25.11.2011
+
+///////////////////////////////////////////////////////////////////////////////
+// 1-й аргумент - узел, входящий в связку отношения под атрибутом 1_
+// 2-й аргумент - узел, входящий в связку отношения под атрибутом 2_
+// 3-й аргумент - знак отношения
+#include "scp_keynodes.scsy"
+#include "ordinal.scsy"
+#include "meta_info.scsy"
+
+procedure(gen_bin_pair,
+[[
+	
+]],
+[{	
+	segment, segments,
+	tempArc, tempAttributeArc,
+	relation, relationLink, firstRelationNode, secondRelationNode
+}],
+{[
+	1_: in_: firstRelationNode,	
+	2_: in_: secondRelationNode,
+	3_: in_: relation
+]}
+)
+
+// Получение сегмента, в котором находится узел отношения
+sys_get_location([
+	1_: fixed_: relation, 
+	2_: assign_: segment
+])
+
+// Установка найденного сегмента как основного
+sys_set_default_segment([
+	1_: fixed_: segment 
+])
+
+// Разворачивание установленного сегмента
+sys_spin_segment([
+	1_: fixed_: segment, 
+	2_: assign_: segments
+])
+
+// Генерация связки отношения
+genElStr3([
+	1_: fixed_: relation,
+	2_: assign_: const_: pos_: arc_: tempArc,
+	3_: assign_: const_: node_: relationLink
+])
+
+// Генерация типа связки отношения (stype_sheaf) 
+genElStr3([
+	1_: fixed_: stype_sheaf,
+	2_: assign_: const_: pos_: arc_: tempArc,
+	3_: fixed_: relationLink
+])
+
+// Генерация значения по первому атрибуту
+genElStr5([
+	1_: fixed_: relationLink,
+	2_: assign_: const_: pos_: arc_: tempArc,
+	3_: fixed_: firstRelationNode,
+	4_: assign_: const_: pos_: arc_: tempAttributeArc,
+	5_: fixed_: 1_
+])
+
+// Генерация значения по второму атрибуту
+genElStr5([
+	1_: fixed_: relationLink,
+	2_: assign_: const_: pos_: arc_: tempArc,
+	3_: fixed_: secondRelationNode,
+	4_: assign_: const_: pos_: arc_: tempAttributeArc,
+	5_: fixed_: 2_
+])
+
+return()
+end()

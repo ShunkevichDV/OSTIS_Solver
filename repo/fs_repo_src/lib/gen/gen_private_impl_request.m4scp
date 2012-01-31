@@ -1,0 +1,132 @@
+
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: gen_private_impl_request.m4scp
+// Description:
+// Файл содержит процедуру запуска операции генерации 
+// максимально частного высказывания для некоторого
+// импликативного высказывания с учетом заданного объекта
+// 1-й аргумент - исходное высказывание
+// 2-й аргумент - исходный объект
+// 3-й аргумент - частное высказывание
+/////////////////////////////////////////////////////
+// 		Author: Daniil Shunkevich
+//        Date: 21.03.11
+
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "lib_search.scsy"
+
+procedure(gen_private_impl_request,
+[[	
+	rrel_answer_is_present;
+	q_gen_all_accessory_links;
+	nrel_inclusion;
+]],
+[{	
+	stat,arc,arc1,seg,segments,temp,temp1,res_stat,obj,waitarc
+}],
+{[
+	1_: in_: stat,
+	2_: in_: obj,
+	3_: out_: res_stat
+]}
+)
+sys_get_location([1_: stat,2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+
+genElStr3([
+	1_: fixed_: q_gen_private_impl,
+	2_: assign_: const_: pos_: waitarc,
+	3_: assign_: const_: node_: temp
+])
+genElStr5([
+	1_: fixed_: temp,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: stat,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 1_
+])
+genElStr5([
+	1_: fixed_: temp,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: temp1,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 2_
+])
+genElStr3([
+	1_: fixed_: temp1,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: obj
+])
+genElStr3([
+	1_: fixed_: question,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: temp
+])
+genElStr3([
+	1_: fixed_: q_initiated,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: temp
+])
+
+label(wait1)
+sys_wait([
+	1_: fixed_: catch_input_arc,
+	2_: fixed_: {1_: waitarc}
+])
+searchElStr5([
+	1_: fixed_: q_gen_private_impl,
+	2_: fixed_: waitarc,
+	3_: fixed_: temp,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: rrel_answer_is_absent
+],exit)
+searchElStr5([
+	1_: fixed_: q_gen_private_impl,
+	2_: fixed_: waitarc,
+	3_: fixed_: temp,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: rrel_answer_is_present
+],,wait1)
+
+callReturn([
+	1_: fixed_: search_bin_pair_end_proc,
+	2_: fixed_:
+		{[
+			1_: fixed_: temp,
+			2_: fixed_: nrel_answer,
+			3_: assign_: temp1
+		]}
+])
+searchElStr3([
+	1_: fixed_: temp1,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: res_stat
+])
+label(exit)
+return()
+end

@@ -1,0 +1,110 @@
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2011 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+//----------------------------------------------------------------------
+// File: search_explanation.m4scp
+// Description: Файл содержит операцию поиска пояснения
+//----------------------------------------------------------------------
+// Author: Kharkunov Eugene
+// Date: 19.11.11
+
+#include "scp_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "lib_search.scsy"
+#include "lib_set.scsy"
+#include "lib_answer.scsy"
+
+program(init_op,
+[[
+	q_initiated;
+	catch_output_arc;
+	run_op;
+]],
+[{
+}])
+
+sys_set_event_handler([
+	1_: fixed_: catch_output_arc,
+	2_: fixed_: run_op,
+	3_: fixed_: {1_: q_initiated}
+])
+
+return()
+
+end()
+
+procedure(run_op,
+[[
+	q_search_explanation;
+	search_base_cycle;
+	search_explanation;
+	answer_make;
+	set_rm_el;
+]],
+[{
+	descr, element, arc, question_node, a, segment, result
+}],
+{[
+	1_: in_: descr,
+	2_: in_: element,
+	3_: in_: arc,
+	4_: in_: question_node
+]})
+
+searchElStr3([
+	1_: fixed_: q_search_explanation,
+	2_: assign_: const_: pos_: arc_: a,
+	3_: fixed_: question_node
+], , finish)
+
+callReturn([
+	1_: fixed_: search_base_cycle,
+	2_: fixed_: {[
+		1_: question_node,
+		2_: search_explanation,
+		3_: result
+	]}
+], , , error)
+
+callReturn([
+	1_: fixed_: set_rm_el,
+	2_: fixed_: {[
+		1_: result,
+		2_: question_node
+	]}
+], , , error)
+
+callReturn([
+	1_: fixed_: answer_make,
+	2_: fixed_: {[
+		1_: question_node,
+		2_: result
+	]}
+], , , error)
+
+label(error)
+
+label(finish)
+
+return()
+
+end

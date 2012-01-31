@@ -1,0 +1,228 @@
+
+
+/* -----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2011 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modfirst_ely
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  first_el not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: check_atomic_statement_validity_prov.m4scp
+// Description: Файл содержит операцию доказательства 
+//              истинности атомарного высказывания с попыткой доказательства
+/////////////////////////////////////////////////////
+// 		Author: Daniil Shunkevich
+//        Date: 05.09.2011 
+
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "lib_search.scsy"
+#include "lib_system.scsy"
+#include "lib_erase.scsy"
+#include "lib_gen.scsy"
+#include "lib_answer.scsy"
+#include "lib_other.scsy"
+
+program(init_op,
+[[
+	// Вызываемая SCP-программа
+	check_atomic_statement_validity;	
+	// Ключевой узел, обозначающий инициированный вопрос
+	q_initiated;
+	// Событие, на которое реагирует обработчик(проведение выходящей дуги из узла)
+	catch_output_arc;
+]],
+[{
+}],
+{[
+]}
+)
+// Установка обработчика события на проведение дуги  из узла "запрос истинности атомарного высказывания" 
+sys_set_event_handler([
+	1_: fixed_: catch_output_arc,
+	2_: fixed_: check_atomic_statement_validity_prov,
+	3_: fixed_: {1_: q_initiated}
+])
+return()
+end
+
+procedure(check_atomic_statement_validity_prov,
+[[
+	here=/"\n\nI have entered CHECK ATOMIC STATEMENT VALIDITY PROV\n\n"/;
+	exited=/"\n\nI have exited CHECK ATOMIC STATEMENT VALIDITY PROV\n\n"/;
+]],
+[{	
+	inputarc,arc,arc1,value,handler,element,seg,segments,temp,temp_set,attr,v_v_arc,answer,stat,data_set
+}],
+{[
+	1_: in_: handler,
+	2_: in_: element,
+	3_: in_: inputarc,
+	4_: in_: value
+]}
+)
+sys_get_location([1_: value,2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+
+searchElStr3([
+	1_: fixed_:  q_validity,
+	2_: assign_: const_: pos_: v_v_arc,
+	3_: fixed_: value
+],,exit)
+searchElStr3([
+	1_: assign_: const_: pos_: attr,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: v_v_arc
+],exit)
+searchElStr5([
+	1_: fixed_: value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: stat,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 1_
+],attr_found)
+searchElStr3([
+	1_: fixed_: value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: stat
+],,exit)
+label(attr_found)
+searchElStr3([
+	1_: fixed_: nrel_impl,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: stat
+],exit)
+searchElStr3([
+	1_: fixed_: nrel_eq,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: stat
+],exit)
+
+printNl([1_: here])
+eraseEl([1_: fixed_: inputarc])
+
+searchSetStr3([
+	1_: fixed_: value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: temp,
+	set3_: assign_: temp_set
+])
+eraseElStr3([
+	1_: fixed_: temp_set,
+	2_: assign_: const_: pos_: f_: arc,
+	3_: fixed_: stat
+])
+searchElStr3([
+	1_: fixed_: temp_set,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: data_set
+])
+ifVarAssign([1_: data_set],no_gen_data_set)
+genEl([1_: node_: const_: assign_: data_set])
+label(no_gen_data_set)
+eraseEl([1_: fixed_: temp_set])
+callReturn([
+	1_: fixed_: gen_checking_atomic_statement_validity_request,
+	2_: fixed_: {[
+		1_: fixed_: stat,
+		2_: fixed_: data_set,
+		3_: assign_: temp
+	]}
+])
+ifVarAssign([1_: temp],gen,nogen)
+
+label(gen)
+
+genElStr3([
+	1_: fixed_: rrel_answer_is_present,
+	2_: assign_: const_: pos_: arc1,
+	3_: fixed_: v_v_arc
+])
+
+genElStr3([
+	1_: assign_: node_: const_: answer,
+	2_: assign_: pos_: const_: arc,
+	3_: fixed_: rrel_answer_is_present
+])
+genElStr3([
+	1_: fixed_: answer,
+	2_: assign_: pos_: const_: arc,
+	3_: fixed_: v_v_arc
+])
+genElStr3([
+	1_: fixed_: answer,
+	2_: assign_: pos_: const_: arc,
+	3_: fixed_: arc1
+])
+genElStr3([
+	1_: fixed_: answer,
+	2_: assign_: pos_: const_: arc,
+	3_: fixed_: value
+])
+genElStr3([
+	1_: fixed_: answer,
+	2_: assign_: pos_: const_: arc,
+	3_: fixed_: q_validity
+])
+
+/////////////////////////////////////////////////////
+// Call of the answer making procedure
+callReturn([
+	1_:	fixed_: answer_make,
+	2_:	fixed_: {[
+			1_: value,
+			2_: answer
+		]}
+	]
+)
+
+printNl([1_: /"REQUESTED STATEMENT WAS PROVED!\n"/])
+
+eraseSetStr3([
+	1_: fixed_: group_looked_throught,
+	2_: assign_: const_: pos_: f_: arc,
+	3_: assign_: node_: const_: temp
+],next,next)
+
+label(nogen)
+eraseSetStr3([
+	1_: fixed_: group_looked_throught,
+	2_: assign_: const_: pos_: f_: arc,
+	3_: assign_: node_: const_: temp
+])
+genElStr3([
+	1_: fixed_: rrel_answer_is_absent,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: v_v_arc
+],next,next)
+
+label(next)
+
+genElStr3([
+	1_: fixed_: q_initiated,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: value
+])
+
+label(exit)
+//#//#printEl([1_: req])
+printNl([1_: exited])
+return()
+end

@@ -1,0 +1,98 @@
+
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+// common keynodes
+nrel_decomposition 		=	"/etc/com_keynodes/декомпозиция*";
+nrel_identification		=	"/etc/com_keynodes/идентификация*";
+nrel_authors			=	"/etc/com_keynodes/авторы*";
+nrel_illustration		=	"/etc/com_keynodes/иллюстрация*";
+nrel_addition 			=	"/etc/com_keynodes/сложение величин*";
+nrel_multiplication 	=	"/etc/com_keynodes/произведение величин*";
+nrel_value 				=	"/etc/com_keynodes/значение*";
+nrel_exponention		=	"/etc/com_keynodes/возведение величин в степень*";
+nrel_greater         =   "/etc/com_keynodes/больше*";
+nrel_equals          =   "/etc/com_keynodes/равенство*";
+
+nrel_antipode			=	"/etc/com_keynodes/антипод*";
+nrel_prototype			=	"/etc/com_keynodes/аналог*";
+nrel_definition			=	"/etc/com_keynodes/определение*";
+nrel_explanation		=	"/etc/com_keynodes/пояснение*";
+nrel_same_concepts		= 	"/etc/com_keynodes/отношения, области определения которых являются надмножеством описываемого множества и каждая связка которых связывает элементы описываемого множества между собой*";
+nrel_diff_concepts		=	"/etc/com_keynodes/отношения, области определения которых являются надмножеством описываемого множества и связки которых, в общем случае, связывают элементы описываемого множества с другими объектами*";
+nrel_intersect_with_concept	=	"/etc/com_keynodes/отношения, области определения которых строго пересекаются с описываемым множеством*";
+nrel_rel_schema			=	"/etc/com_keynodes/схема отношения*";
+nrel_domain				= 	"/etc/com_keynodes/домен*";
+nrel_bibliography		=	"/etc/com_keynodes/библиография*";
+nrel_proof				=	"/etc/com_keynodes/доказательство*";
+nrel_partition			=	"/etc/com_keynodes/разбиение*";
+nrel_statement   		= 	"/etc/com_keynodes/утверждение*";
+rrel_superset   = "/etc/com_keynodes/надмножество_";
+rrel_subset    = "/etc/com_keynodes/подмножество_";
+nrel_prop_inclusion  =  "/etc/com_keynodes/строгое включение*";
+
+rrel_exp_base			=	"/etc/com_keynodes/основание_";
+rrel_exp_degree			=	"/etc/com_keynodes/степень_";
+rrel_exp_exponent		=	"/etc/com_keynodes/показатель_";
+
+rrel_russian_text		=	"/etc/com_keynodes/русский текст_";
+rrel_english_text		=	"/etc/com_keynodes/английский текст_";
+rrel_decimal_number		=	"/etc/com_keynodes/десятичное число_";
+
+nrel_copy				=   "/etc/com_keynodes/копия*";
+nrel_inclusion			=	"/etc/com_keynodes/включение*";
+nrel_basic_sequence		=	"/etc/com_keynodes/базовая последовательность*";
+nrel_solution			=	"/etc/com_keynodes/решение*";
+nrel_impl				=	"/etc/com_keynodes/impl*";
+nrel_conj				=	"/etc/com_keynodes/conj*";
+nrel_eq					=	"/etc/com_keynodes/eq*";
+nrel_statements_about_class			=	"/etc/com_keynodes/утверждения о классе*";
+nrel_work_result		=	"/etc/com_keynodes/результат выполнения*";
+nrel_start_condition	=	"/etc/com_keynodes/условие запуска*";
+nrel_successful_production	=	"/etc/com_keynodes/успешно примененная продукция*";
+nrel_logic_consequence_modus_ponens	=	"/etc/com_keynodes/логическое следствие на основе modus_ponens*";
+
+rrel_answer_is_present	=   "/etc/com_keynodes/присутствует ответ_";
+rrel_answer_is_absent	=   "/etc/com_keynodes/отсутствует ответ_";
+rrel_solution_attempt_unsuccessful	=   "/etc/com_keynodes/попытка решения безуспешна_";
+rrel_answer_is_absent_at_evident_view	=   "/etc/com_keynodes/ответ отсутствует в явном виде_";
+rrel_formula_is_absent	=   "/etc/com_keynodes/отсутствует формула_";
+rrel_operation_is_over	=   "/etc/com_keynodes/операция выполнилась_";
+rrel_expression_is_substituted	=   "/etc/com_keynodes/выражение подставлено_";
+rrel_expression_isnt_substituted	=   "/etc/com_keynodes/выражение не подставлено_";
+rrel_program_is_absent	=   "/etc/com_keynodes/отсутствует программа_";
+
+group_transitive_relation = "/etc/com_keynodes/транзитивное отношение";
+group_all_equivalent_constructions = "/etc/com_keynodes/все семантически эквивалентные конструкции";
+group_theory = "/etc/com_keynodes/теория";
+group_generated_statement = "/etc/com_keynodes/сгенерированное высказывание";
+group_looked_throught = "/etc/com_keynodes/просмотренный узел";
+group_sc_operation = "/etc/com_keynodes/sc-операция";
+group_sc_program = "/etc/com_keynodes/sc-программа";
+group_arifmetic_relation = "/etc/com_keynodes/арифметическое отношение";
+group_arifmetic_descr = "/etc/com_keynodes/дескриптор инициирования арифметической операции";
+group_atomic_existence_single = "/etc/com_keynodes/атомарное сущестовование и единственность";
+group_atomic_existence = "/etc/com_keynodes/атомарное сущестовование";
+
+task_solving_steps = "/etc/com_keynodes/этапы решения задачи";
+
+nrel_square = "/seb/planimetry/площадь*";

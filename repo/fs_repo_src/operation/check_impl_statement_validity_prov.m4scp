@@ -1,0 +1,264 @@
+
+
+/* -----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2011 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modfirst_ely
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  first_el not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: check_impl_statement_validity_prov.m4scp
+// Description: Файл содержит операцию доказательства 
+//              истинности импликативного высказывания
+//	       с попыткой доказательства
+/////////////////////////////////////////////////////
+// 		Author: Daniil Shunkevich
+//        Date: 30.09.2011 
+
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "lib_search.scsy"
+#include "lib_system.scsy"
+#include "lib_set.scsy"
+#include "lib_gen.scsy"
+#include "lib_answer.scsy"
+#include "lib_other.scsy"
+#include "meta_info.scsy"
+
+program(init_op,
+[[
+	q_initiated;
+	// Событие, на которое реагирует обработчик(проведение выходящей дуги из узла)
+	catch_output_arc;
+]],
+[{
+}],
+{[
+]}
+)
+// Установка обработчика события на проведение дуги  из узла "запрос истинности атомарного высказывания" 
+sys_set_event_handler([
+	1_: fixed_: catch_output_arc,
+	2_: fixed_: check_impl_statement_validity_prov,
+	3_: fixed_: {1_: q_initiated}
+])
+return()
+end
+
+procedure(check_impl_statement_validity_prov,
+[[
+	here=/"\n\nI have entered CHECK IMPL STATEMENT VALIDITY PROV\n\n"/;
+	exited=/"\n\nI have exited CHECK IMPL STATEMENT VALIDITY PROV\n\n"/;
+]],
+[{	
+	inputarc,arc,arc1,value,handler,element,seg,segments,
+	temp,attr,v_v_arc,answer,stat,empty_set,left,right,
+	data_set,result,new_left,solution
+}],
+{[
+	1_: in_: handler,
+	2_: in_: element,
+	3_: in_: inputarc,
+	4_: in_: value
+]}
+)
+sys_get_location([1_: value,2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+
+searchElStr3([
+	1_: fixed_:  q_validity,
+	2_: assign_: const_: pos_: v_v_arc,
+	3_: fixed_: value
+],,exit)
+searchElStr3([
+	1_: assign_: const_: pos_: attr,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: v_v_arc
+],exit)
+searchElStr3([
+	1_: fixed_: value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: stat
+])
+searchElStr3([
+	1_: fixed_: nrel_impl,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: stat
+],,exit)
+
+printNl([1_: here])
+
+//#eraseEl([1_: fixed_: inputarc])
+
+printEl([1_: stat])
+
+searchElStr5([
+	1_: fixed_: stat,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: left,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 1_
+])
+searchElStr5([
+	1_: fixed_: stat,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: right,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 2_
+])
+callReturn([
+	1_: fixed_: set_cantorize,
+	2_: fixed_: {[
+		1_: fixed_: left,
+		2_: assign_: left
+	]}
+])
+
+//#printNl([1_: /"CISV_SGTHEN"/])
+//#printEl([1_: left])
+sys_gen([
+	1_: fixed_: left,
+	4_: assign_: data_set
+])
+
+eraseSetStr3([
+	1_: fixed_: data_set,
+	2_: assign_: const_: pos_: f_: arc,
+	3_: assign_: arc_: temp
+])
+selectNStr3([
+	1_: fixed_: stype_concept_norel,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: temp,
+	set3_: fixed_: data_set
+])
+selectNStr3([
+	1_: fixed_: stype_bin_orient_norole_rel,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: temp,
+	set3_: fixed_: data_set
+])
+selectNStr3([
+	1_: fixed_: stype_bin_orient_role_rel,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: temp,
+	set3_: fixed_: data_set
+])
+selectNStr3([
+	1_: fixed_: stype_sheaf,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: temp,
+	set3_: fixed_: data_set
+])
+printEl([1_: data_set])
+selectNStr3([
+	1_: fixed_: "/proc/keynode/num_attr",
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: temp,
+	set3_: fixed_: data_set
+])
+
+callReturn([
+	1_: fixed_: gen_check_atomic_statement_validity_prov_request,
+	2_: fixed_: {[
+		1_: fixed_: right,
+		2_: fixed_: data_set,
+		3_: assign_: temp
+	]}
+])
+//#eraseEl([1_: fixed_: data_set])
+ifVarAssign([1_: temp],gen,nogen)
+
+label(gen)
+
+callReturn([
+	1_: fixed_: search_bin_pair_end_proc,
+	2_: fixed_:
+		{[
+			1_: fixed_: temp,
+			2_: fixed_: nrel_solution,
+			3_: assign_: solution
+		]}
+])
+ifVarAssign([1_: solution],no_gen_solution1)
+genEl([1_: assign_: const_: node_: solution])
+label(no_gen_solution1)
+
+callReturn([
+	1_: fixed_: gen_bin_pair,
+	2_: fixed_:
+		{[
+			1_: fixed_: value,
+			2_: fixed_: solution,
+			3_: fixed_: nrel_solution
+		]}
+])
+genElStr3([
+	1_: fixed_: rrel_answer_is_present,
+	2_: assign_: const_: pos_: arc1,
+	3_: fixed_: v_v_arc
+])
+
+genElStr3([
+	1_: assign_: node_: const_: answer,
+	2_: assign_: pos_: const_: arc,
+	3_: fixed_: rrel_answer_is_present
+])
+genElStr3([
+	1_: fixed_: answer,
+	2_: assign_: pos_: const_: arc,
+	3_: fixed_: v_v_arc
+])
+genElStr3([
+	1_: fixed_: answer,
+	2_: assign_: pos_: const_: arc,
+	3_: fixed_: arc1
+])
+genElStr3([
+	1_: fixed_: answer,
+	2_: assign_: pos_: const_: arc,
+	3_: fixed_: value
+])
+genElStr3([
+	1_: fixed_: answer,
+	2_: assign_: pos_: const_: arc,
+	3_: fixed_: q_validity
+])
+
+/////////////////////////////////////////////////////
+// Call of the answer making procedure
+callReturn([
+	1_:	fixed_: answer_make,
+	2_:	fixed_: {[
+			1_: value,
+			2_: answer
+		]}
+	]
+)
+
+printNl([1_: /"REQUESTED IMPL STATEMENT WAS PROVED!\n"/],exit,exit)
+
+label(nogen)
+
+label(exit)
+//#//#printEl([1_: req])
+printNl([1_: exited])
+return()
+end

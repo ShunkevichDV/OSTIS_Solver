@@ -1,0 +1,117 @@
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2011 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+//----------------------------------------------------------------------
+// File: search_prototype.m4scp
+// Description: Операция поиска аналогов объекта
+//----------------------------------------------------------------------
+// Author: Kharkunov Eugene
+// Date: 20.11.11
+
+#include "scp_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "lib_set.scsy"
+#include "lib_search.scsy"
+#include "lib_answer.scsy"
+
+//программа инициализации операции
+program(init_op,
+[[
+	q_initiated;
+	elmn_pattern = {1_: q_initiated };
+	run_op;
+	catch_output_arc;
+]],
+[{
+}])
+
+sys_set_event_handler([
+	1_: fixed_: catch_output_arc,
+	2_: fixed_: run_op,
+	3_: fixed_: elmn_pattern
+	])
+
+return()
+end()
+
+//процедура обработки вопроса и генерации ответа
+procedure(run_op,
+[[
+	q_search_prototype;
+	set_rm_el;
+	search_prototype;
+	search_base_cycle;
+	answer_make;
+]],
+[{
+	descr, element, arc, question_node,
+	descr2, segment, result, a
+}],
+{[
+	1_: in_: descr,
+	2_: in_: element,
+	3_: in_: arc,
+	4_: in_: question_node
+]})
+
+printNl([1_: fixed_: /"\nchecking: Op_search_prototype\n"/])
+
+sys_get_location([1_: fixed_: question_node, 2_: assign_: segment])
+sys_open_segment([1_: fixed_: segment])
+sys_set_default_segment([1_: fixed_: segment])
+
+searchElStr3([
+	1_: fixed_: q_search_prototype,
+	2_: assign_: const_: pos_: arc_: a,
+	3_: fixed_: question_node
+], , finish)
+
+callReturn([
+	1_: fixed_: search_base_cycle,
+	2_: fixed_: {[
+		1_: question_node,
+		2_: search_prototype,
+		3_: result
+		]}
+], , , error)
+
+callReturn([
+	1_: fixed_: set_rm_el,
+	2_: fixed_: {[
+		1_: result,
+		2_: question_node]}
+	], , , error)
+
+callReturn([
+	1_:	fixed_: answer_make,
+	2_:	fixed_: {[
+		1_: question_node,
+		2_: result]}
+], finish, , error)
+
+label(error)
+
+label(finish)
+
+return()
+
+end

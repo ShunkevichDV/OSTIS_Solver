@@ -1,0 +1,19 @@
+
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+
+program(hello_world,
+[[	
+	message=/"\n\nHELLO WORLD!\n\n"/;
+]],
+[{
+}],
+{[
+]}
+)	
+
+printNl([1_: message])
+
+return()
+end

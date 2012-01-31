@@ -1,0 +1,11 @@
+#include "ext_program_keynodes.scsy"
+#include "graph_keynodes.scsy"
+
+dynamicModule -> ext_dynmod;
+externalProgram, ext_dynmod -> Test_ext_prg = { prm_: { 1_: in_: $1, 2_: out_: $2, 3_: in_: out_: $3 } };
+
+dynamicModule -> graphs;
+externalProgram, graphs -> wave_find_min_path = { prm_: { 1_: in_: $1, 2_: in_: $2, 3_: in_: $3, 4_: out_: $4 } };
+
+"Test_ext_prg" = "/seb/planimetry/Test_ext_prg";
+"wave_find_min_path" = "/seb/planimetry/wave_find_min_path";

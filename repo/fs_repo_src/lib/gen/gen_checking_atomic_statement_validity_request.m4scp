@@ -1,0 +1,113 @@
+
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+procedure(gen_checking_atomic_statement_validity_request,
+[[
+	//  лючевой узел, обозначающий запрос
+	q_atomic_statement_validity;
+	
+	//  лючевой узел, обозначающий инициированный вопрос
+	q_initiated;
+	
+	//  лючевой узел, обозначающий вопрос
+	question;
+	
+	// јтрибут присутстви€ ответа
+	rrel_answer_is_present;
+	
+	// јтрибут отсутстви€ ответа
+	rrel_answer_is_absent;
+]],
+[{
+	arcVar, questionNode, arifmeticLink,
+	isSuccess, arc, attributeArc, arcForWaiting, formula, setForSubstitution
+}],
+{[
+	1_: in_: formula,
+	2_: in_: setForSubstitution,
+	3_: out_: isSuccess
+]}
+)
+
+// »нициируем выполнение операции установлени€ истинности атомарного высказывани€
+// ѕроводим дугу из запроса
+genElStr3([
+	1_: fixed_: q_atomic_statement_validity,
+	2_: assign_: arc_: const_: pos_: actual_: arcForWaiting,
+	3_: assign_: const_: node_: questionNode
+])
+// √енерируем дугу из вопроса в формулу с атрибутом "1_"
+genElStr5([
+	1_: fixed_: questionNode,
+	2_: assign_: arc_: const_: pos_: actual_: arcVar,
+	3_: fixed_: formula,
+	4_: assign_: arc_: const_: pos_: actual_: attributeArc,
+	5_: fixed_: 1_
+])
+
+// √енерируем дугу из вопроса в множество подставл€емых элементов с атрибутом "2_"
+genElStr5([
+	1_: fixed_: questionNode,
+	2_: assign_: arc_: const_: pos_: actual_: arcVar,
+	3_: fixed_: setForSubstitution,
+	4_: assign_: arc_: const_: pos_: actual_: attributeArc,
+	5_: fixed_: 2_
+])
+
+// ѕроводим дугу из узла "вопрос"
+genElStr3([
+	1_: fixed_: question,
+	2_: assign_: arc_: const_: pos_: actual_: arcVar,
+	3_: fixed_: questionNode
+])
+		
+// ѕроводим дугу из узла "инициированный вопрос"
+genElStr3([
+	1_: fixed_: q_initiated,
+	2_: assign_: arc_: const_: pos_: actual_: arcVar,
+	3_: fixed_: questionNode
+])
+		
+// ∆дем пока инициированна€ операци€ завершитс€
+label(waitingForOperation)
+
+	sys_wait([
+		1_: fixed_: catch_input_arc,
+		2_: fixed_: {1_: arcForWaiting}
+	])
+	//#printNl([1_: /"SYS_WAIT"/])
+	//#printEl([1_: arcForWaiting])
+	// »щем атрибут "присутствует ответ_"
+	searchElStr5([
+		1_: fixed_: q_atomic_statement_validity,
+		2_: fixed_: arcForWaiting,
+		3_: fixed_: questionNode,
+		4_: assign_: arc_: const_: pos_: actual_: arcVar,
+		5_: fixed_: rrel_answer_is_present
+	], success)
+	
+	// »щем атрибут "отсутсвует ответ_"
+	searchElStr5([
+		1_: fixed_: q_atomic_statement_validity,
+		2_: fixed_: arcForWaiting,
+		3_: fixed_: questionNode,
+		4_: assign_: arc_: const_: pos_: actual_: arcVar,
+		5_: fixed_: rrel_answer_is_absent
+	], exit, waitingForOperation)
+
+// ”спешное завершение операции установлени€ истинности атомарного высказывани€
+label(success)
+	
+	// √енерируем признак успешного завершени€ операции	
+	genEl([
+		1_: assign_: node_: const_: isSuccess
+	])
+
+// Ѕезуспешное завершение операции установлени€ истинности атомарного высказывани€
+label(exit)
+			
+return()
+
+end
+	

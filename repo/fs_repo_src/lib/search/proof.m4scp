@@ -1,0 +1,30 @@
+#include "scp_keynodes.scsy"
+#include "lib_search.scsy"
+#include "com_keynodes.scsy"
+
+procedure(proof,
+[[
+	search_base_rel_in_with_sheaf;
+	nrel_proof;
+]],
+[{
+	element, result
+}],
+{[
+	1_: in_: element,
+	2_: in_: result
+]})
+
+callReturn([
+	1_: fixed_: search_base_rel_in_with_sheaf,
+	2_: fixed_: {[
+		1_: element,
+		2_: nrel_proof,
+		3_: result
+	]}
+])
+
+
+return()
+
+end

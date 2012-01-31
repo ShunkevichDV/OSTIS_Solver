@@ -1,0 +1,76 @@
+//#sss
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "graph_keynodes.scsy"
+#include "etc_questions.scsy"
+
+program(temp2,
+[[	
+	link1="/seb/planimetry/Формула Герона";
+	link2="/seb/planimetry/Теорема Пифагора";
+	here=/"\n\nTEMP2 ended!\n\n"/;
+	req="/seb/planimetry/запрос поиска минимального пути в графе";
+	question;
+	1_;
+	2_;
+	v1={};
+	v2={};
+	v3={};
+	v4={};
+	v5={};
+	test_graph = {
+		vertex_: v1, vertex_: v2, vertex_: v3, vertex_: v4, vertex_: v5, 
+		connective_: e1 = {v1, v2},
+		connective_: e2 = {v1, v3},
+		connective_: e5 = {v5, v4},
+		connective_: e6 = {v3, v4}
+	};
+]],
+[{
+	arc,descr,temp,arc1
+}],
+{[
+]}
+)
+printEl([1_: test_graph])
+genElStr3([
+	1_: fixed_: req,
+	2_: assign_: arc,
+	3_: assign_: const_: node_: temp
+])
+genElStr5([
+	1_: fixed_: temp,
+	2_: assign_: arc,
+	3_: fixed_: test_graph,
+	4_: assign_: arc1,
+	5_: fixed_: 1_
+])
+genElStr5([
+	1_: fixed_: temp,
+	2_: assign_: arc,
+	3_: fixed_: v1,
+	4_: assign_: arc1,
+	5_: fixed_: 2_
+])
+genElStr5([
+	1_: fixed_: temp,
+	2_: assign_: arc,
+	3_: fixed_: v5,
+	4_: assign_: arc1,
+	5_: fixed_: 3_
+])
+genElStr3([
+	1_: fixed_: question,
+	2_: assign_: arc_: arc,
+	3_: fixed_: temp
+])
+genElStr3([
+	1_: fixed_: q_initiated,
+	2_: assign_: arc,
+	3_: fixed_: temp
+])
+
+printNl([1_: here])
+
+return()
+end

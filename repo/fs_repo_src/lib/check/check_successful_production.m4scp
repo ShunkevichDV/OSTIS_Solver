@@ -1,0 +1,116 @@
+
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: check_successful_production.m4scp
+// Description:
+// Файл содержит процедуру проверки факта
+// использования данного логического выражения в заданном
+// контексте при решении какой-либо задачи для
+// оптимизации процесса решения
+// 1-й аргумент - логическое высказывание
+// 2-й аргумент - множество параметров продукции
+// 3-й аргумент - логический результат работы (истина/ложь)
+/////////////////////////////////////////////////////
+// 		Author: Daniil Shunkevich
+//        Date: 11.07.11
+
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "lib_set.scsy"
+#include "lib_search.scsy"
+
+procedure(check_successful_production,
+[[
+]],
+[{	
+	arc,arc1,links,temp,node,seg,segments,bool_res,stat,objects,link,node,res,link_arc
+}],
+{[
+	1_: in_: stat,
+	2_: in_: objects,
+	3_: out_: bool_res
+]}
+)
+
+sys_get_location([1_: stat,2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+
+searchSetStr5([
+	1_: assign_: const_: node_: temp,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: stat,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 2_,
+	set1_: assign_: links
+])
+selectYStr3([
+	1_: fixed_: nrel_successful_production,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: temp,
+	set3_: fixed_: links
+])
+
+label(next_link)
+ifVarAssign([1_: link_arc],,no_erase_link_arc)
+eraseEl([1_: fixed_: link_arc])
+label(no_erase_link_arc)
+searchElStr3([
+	1_: fixed_: links,
+	2_: assign_: const_: pos_: link_arc,
+	3_: assign_: const_: node_: link
+],,gen_bad_result)
+//#searchElStr3([
+//#	1_: fixed_: nrel_successful_production,
+//#	2_: assign_: const_: pos_: arc,
+//#	3_: fixed_: link
+//#],,next_link)
+searchElStr5([
+	1_: fixed_: link,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: node,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 1_
+])
+callReturn([
+	1_: fixed_: set_equals,
+	2_: fixed_:
+		{[
+			1_: fixed_: objects,
+			2_: fixed_: node,
+			3_: assign_: res
+		]}
+])
+ifVarAssign([1_: res],,next_link)
+eraseEl([1_: fixed_: res])
+
+label(gen_good_result)
+genEl([1_: assign_: const_: node_: bool_res],exit,exit)
+label(gen_bad_result)
+label(exit)
+ifVarAssign([1_: links],,no_erase_links)
+eraseEl([1_: fixed_: links])
+label(no_erase_links)
+return()
+end

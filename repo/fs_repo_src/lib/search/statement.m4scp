@@ -1,0 +1,30 @@
+#include "scp_keynodes.scsy"
+#include "lib_search.scsy"
+#include "com_keynodes.scsy"
+
+procedure(statement,
+[[
+	search_all_bin_rel;
+	nrel_statement;
+]],
+[{
+	element, result
+}],
+{[
+	1_: in_: element,
+	2_: in_: result
+]})
+
+callReturn([
+	1_: fixed_: search_all_bin_rel,
+	2_: fixed_: {[
+		1_: element,
+		2_: nrel_statement,
+		3_: result
+	]}
+])
+
+
+return()
+
+end

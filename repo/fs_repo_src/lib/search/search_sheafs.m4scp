@@ -1,0 +1,62 @@
+// 
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "meta_info.scsy"
+
+procedure(search_sheafs,
+[[	
+	first=1_;
+	second=2_;
+	set_attr=set_;
+	fixed_attr=fixed_;
+	stype_element;	
+	
+	//#отладочная информация, закомментировать или убрать	
+	here=/"\n\nI have entered search_sheafs!!!\n\n"/;
+	exited=/"\n\nI have exited search_sheafs!!!\n\n"/;
+	found=/"\n\nI found relation!!!\n\n"/;
+	
+]],
+[{	
+	arc,arc1,node,node1,general_set,result_set,seg,segments,set,element,relation,rel,sheaf_set,arc_set,sheaf
+}],
+{[		
+	1_: in_: relation,
+	2_: in_: general_set,	
+	3_: out_: sheaf_set
+]}
+)
+sys_get_location([1_: relation,2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+
+//#printNl([1_: here])
+///////////////////////////////////////
+
+ifVarAssign([1_: general_set],,without_general_set)
+
+searchSetStr5([
+	1_: fixed_: relation,
+	2_: assign_: arc,
+	3_: assign_: sheaf,
+	4_: assign_: arc1,
+	5_:  fixed_: general_set,	
+	set3_: assign_: sheaf_set
+],exit,exit)
+
+label(without_general_set)
+
+searchSetStr3([
+	1_: fixed_: relation,
+	2_: assign_: arc,
+	3_: assign_: sheaf,	
+	set3_: assign_: sheaf_set
+],,exit)
+
+///////////////////////////////////////
+label(exit)
+
+//#printNl([1_: exited])
+return()
+end

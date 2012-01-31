@@ -1,0 +1,110 @@
+
+/* -----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2011 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modfirst_ely
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  first_el not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: check_relation_by_group.m4scp
+// Description: Файл содержит процедуру для проверки принадлежности связки отношения 
+//              некоторому отношению, которое входит в заданную группу отношений
+/////////////////////////////////////////////////////
+// 		Author: Sergei Zalivako
+//        Date: 09.06.2011 
+
+#include "scp_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "com_keynodes.scsy"
+
+procedure(check,
+[[
+	
+]],
+[{
+	relationLink, relationClass, result,
+	location, segments, 
+	someRelation, relationsSet,
+	arcVar
+}],
+{[
+	1_: in_: relationLink,
+	2_: in_: relationClass,
+	3_: out_: result
+]}
+)
+// Получение сегмента, в котором находится проверяемая связка отношения
+sys_get_location([
+	1_: fixed_: relationLink,
+	2_: assign_: location
+])
+
+// Установка найденного сегмента как основного
+sys_set_default_segment([
+	1_: fixed_: location
+])
+
+// Разворачивание установленного сегмента
+sys_spin_segment([
+	1_: fixed_: location,
+	2_: assign_: segments
+])
+
+// Собираем все множества, в которые входит поданная связка
+searchSetStr3([
+	1_: assign_: const_: node_: someRelation,
+	2_: assign_: pos_: const_: arc_: arcVar,
+	3_: fixed_: relationLink,
+	set1_: assign_: const_: node_: relationsSet
+], , exit)
+
+// Цикл по всем множествам, в которые входит связка
+label(nextRelation)
+
+	// Находим очередное множество, в которое входит связка
+	searchElStr3([
+		1_: fixed_: relationsSet,
+		2_: assign_: pos_: const_: arc_: arcVar,
+		3_: assign_: const_: node_: someRelation
+	], , exit)
+	
+	// Удаляем дугу к просмотренному множеству
+	eraseEl([
+		1_: fixed_: f_: arcVar
+	])
+	
+	// Проверяем, является ли найденное отношение принадлежащим указанному классу отношений
+	searchElStr3([
+		1_: fixed_: relationClass,
+		2_: assign_: pos_: const_: arc_: arcVar,
+		3_: fixed_: someRelation
+	], success, nextRelation)
+	
+// успешное заверщение процедуры
+label(success)
+
+	// Создаем признак того, что процедура завершилась успешно
+	genEl([
+		1_: assign_: const_: node_: result
+	])
+
+// Выход из программы или неуспешное завершение
+label(exit)
+return()
+	
+end

@@ -1,0 +1,181 @@
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: find_orient_binary_relation_link.m4scp
+// Description: File contains operation to find a link
+// 			of a given orient binary relation between 
+//			given objects if it exists
+/////////////////////////////////////////////////////
+// 		Author: Daniil Shunkevich
+//        Date: 16.04.11
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "meta_info.scsy"
+#include "lib_search.scsy"
+#include "lib_answer.scsy"
+
+program(init_op,
+[[	
+	q_initiated;
+	catch_output_arc;
+]],
+[{
+	nodeVar
+}],
+{[
+]}
+)
+sys_set_event_handler([
+	1_: fixed_: catch_output_arc,
+	2_: fixed_: find_orient_binary_relation_link,
+	3_: fixed_: {1_: q_initiated},
+	4_: assign_: nodeVar
+])
+
+return()
+end
+
+procedure(find_orient_binary_relation_link,
+[[
+	bin_rel_pattern=[
+		_rel->>_link;
+		_link={. 1_:: _obj1, 2_:: _obj2 .};
+	];
+	rrel_answer_is_present;
+	rrel_answer_is_absent;
+	q_var_value;
+	q_initiated;
+	search_quantity_value;
+	here=/"\n\nI have entered FIND BINARY RELATION LINK\n\n"/;
+	exited=/"\n\nI have exited FIND BINARY RELATION LINK\n\n"/;
+]],
+[{	
+	inputarc,arc,arc1,value,handler,element,seg,segments,temp,attr,req_arc,answer,obj1,obj2,rel
+}],
+{[
+	1_: in_: handler,
+	2_: in_: element,
+	3_: in_: inputarc,
+	4_: in_: value
+]}
+)
+sys_get_location([1_: value,2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+
+searchElStr3([
+	1_: fixed_:  q_orient_binary_relation_link,
+	2_: assign_: const_: pos_: req_arc,
+	3_: fixed_: value
+],,exit)
+searchElStr3([
+	1_: assign_: const_: pos_: attr,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: req_arc
+],exit)
+
+printNl([1_: here])
+
+eraseEl([1_: fixed_: inputarc])
+
+searchElStr5([
+	1_: fixed_: value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: obj1,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 1_
+])
+searchElStr5([
+	1_: fixed_: value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: obj2,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 2_
+])
+searchElStr5([
+	1_: fixed_: value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: rel,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: 3_
+])
+
+sys_search([
+	1_: fixed_: bin_rel_pattern,
+	2_: fixed_: {
+		{1_: _link, 2_: temp}
+	},
+	3_: fixed_: {
+		{1_: _rel, 2_: rel}, {1_: _obj1, 2_: obj1}, {1_: _obj2, 2_: obj2}
+	}
+],gen,nogen)
+
+label(gen)
+genElStr3([
+	1_: assign_: node_: const_: answer,
+	2_: assign_: pos_: const_: arc,
+	3_: fixed_: temp
+])
+
+/////////////////////////////////////////////////////
+// Call of the answer making procedure
+callReturn([
+	1_:	fixed_: answer_make,
+	2_:	fixed_: {[
+			1_: value,
+			2_: answer
+		]}
+	]
+)
+
+printNl([1_: /"REQUESTED LINK EXISTS:\n"/])
+printEl([1_: temp])
+
+genElStr3([
+	1_: fixed_: rrel_answer_is_present,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: req_arc
+],next,next)
+
+label(nogen)
+
+genElStr3([
+	1_: fixed_: rrel_answer_is_absent,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: req_arc
+],next,next)
+
+label(next)
+
+genElStr3([
+	1_: fixed_: q_initiated,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: value
+])
+
+label(exit)
+//#//#printEl([1_: req])
+printNl([1_: exited])
+return()
+end

@@ -1,0 +1,105 @@
+
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: gen_relation_domain.m4scp
+// Description:
+// Файл содержит процедуру генерации домена указанного отношения по заданному атрибуту
+// 1-й аргумент - отношение
+// 2-й аргумент - атрибут
+// 3-й аргумент - результат
+/////////////////////////////////////////////////////
+// 		Author: Daniil Shunkevich
+//        Date: 21.06.11
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "lib_erase.scsy"
+
+procedure(gen_relation_domain,
+[[
+	rel_pattern=[
+		_rel->>{. _attr :: _node.};
+	];
+	rel_meta_pattern=[
+		_rel->>{. _attr :: __node.};
+	];
+]],
+[{	
+	result,relation,attribute,set,set1,arc,arc1,seg,segments
+}],
+{[
+	1_: in_: relation,
+	2_: in_: attribute,
+	3_: out_: result
+]}
+)
+sys_get_location([1_: relation,2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+
+sys_search([
+	1_: fixed_: rel_pattern,
+	2_: fixed_: {
+		{1_: _node, 2_: assign_: set_: set}
+	},
+	3_: fixed_: {
+		{1_: _rel, 2_: relation}, {1_: _attr, 2_: attribute}
+	}
+])
+ifVarAssign([1_: set],,no_set)
+sys_search([
+	1_: fixed_: rel_meta_pattern,
+	2_: fixed_: {
+		{1_: __node, 2_: fixed_: set_: set}
+	},
+	3_: fixed_: {
+		{1_: _rel, 2_: relation}, {1_: _attr, 2_: attribute}
+	}
+],search_done,search_done)
+label(no_set)
+sys_search([
+	1_: fixed_: rel_meta_pattern,
+	2_: fixed_: {
+		{1_: __node, 2_: assign_: set_: set}
+	},
+	3_: fixed_: {
+		{1_: _rel, 2_: relation}, {1_: _attr, 2_: attribute}
+	}
+])
+label(search_done)
+
+ifVarAssign([1_: set],,exit)
+
+callReturn([
+	1_: fixed_: erase_multiple_arcs,
+	2_: fixed_:
+		{[
+			1_: fixed_: set,
+			2_: assign_: result
+		]}
+])
+eraseEl([1_: fixed_: set])
+
+label(exit)
+return()
+end

@@ -1,0 +1,392 @@
+
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: postorder_tree_search_op.m4scp
+// Description: File contains operation to perform
+//			potorder tree search
+/////////////////////////////////////////////////////
+// 		Author: Daniil Shunkevich
+//        Date: 10.02.11
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "lib_search.scsy"
+#include "lib_gen.scsy"
+#include "lib_answer.scsy"
+#include "meta_info.scsy"
+
+program(init_op,
+[[	
+	//#req="/seb/planimetry/запрос поиска в глубину";
+	catch_output_arc;	
+	q_initiated;
+]],
+[{
+	nodeVar
+}],
+{[
+]}
+)
+
+sys_set_event_handler([
+	1_: fixed_: catch_output_arc,
+	2_: fixed_: postorder_tree_search_op,
+	3_: fixed_: {1_: q_initiated},
+	4_: assign_: nodeVar
+])
+
+return()
+end
+
+procedure(postorder_tree_search_op,
+[[
+	rrel_answer_is_present;
+	rrel_answer_is_absent;
+	q_postorder_tree_search;
+	nrel_value;
+	q_initiated;
+	nrel_inclusion;
+	catch_output_arc;
+	catch_input_arc;
+	q_gen_all_accessory_links;
+	gen_all_accessories;
+	group_looked_throught;
+	gen_production_using_classes;
+	nrel_statements_about_class;
+	search_bin_pair_begin_proc;
+	here=/"\n\nI have entered POSTORDER TREE SEARCH\n\n"/;
+	exited=/"\n\nI have exited POSTORDER TREE SEARCH\n\n"/;
+	num_attr="/proc/keynode/num_attr"
+]],
+[{	
+	inputarc,arc,arc1,value,handler,element,seg,segments,temp,rel,obj,
+	class,classes,res,node,set,waitarc,v_v_arc,input_value,attr,link,link_set,
+	link_elem,inp_set_arc,link_arc
+}],
+{[
+	1_: in_: handler,
+	2_: in_: element,
+	3_: in_: inputarc,
+	4_: in_: input_value
+]}
+)
+sys_get_location([1_: input_value,2_: assign_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+sys_set_default_segment([1_: fixed_: seg])
+
+searchElStr3([
+	1_: fixed_: q_postorder_tree_search,
+	2_: assign_: const_: pos_: v_v_arc,
+	3_: fixed_: input_value
+],,exit)
+searchElStr5([
+	1_: fixed_: q_postorder_tree_search,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: input_value,
+	4_: assign_: const_: pos_: arc1,
+	5_: assign_: node_: const_: attr
+],exit)
+printNl([1_: here])
+searchElStr3([
+	1_: fixed_: input_value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: value
+])
+//#ifVarAssign([1_: value],,gen_bad_result)
+//#printEl([1_: value])
+
+genElStr3([
+	1_: fixed_: group_looked_throught,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: value
+])
+/////////////////////////////////////////////////////
+//Starting gen_all_accessories procedure
+callReturn([
+	1_: fixed_: gen_all_accessories,
+	2_: fixed_:
+		{[
+			1_: fixed_: value
+		]}
+])
+printNl([1_: /"PTS VALUE"/])
+printEl([1_: value])
+/////////////////////////////////////////////////////
+//Looking throught all classes in which object is a membership
+callReturn([
+	1_: fixed_: gen_production_using_classes,
+	2_: fixed_:
+		{[
+			1_: fixed_: value,
+			2_: assign_: res
+		]}
+])
+ifVarAssign([1_: res],gen_good_result_gpuc)
+//#---------------------------------main cycle-------------------------------------
+searchSetStr3([
+	1_: assign_: node_: const_: node,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: value,
+	set1_: assign_: set
+],,cycle2)
+
+label(next_link)
+ifVarAssign([1_: inp_set_arc],,no_erase_inp_set_arc)
+eraseEl([1_: fixed_: inp_set_arc])
+label(no_erase_inp_set_arc)
+searchElStr3([
+	1_: fixed_: set,
+	2_: assign_: const_: pos_: inp_set_arc,
+	3_: assign_: const_: node_: link
+],,cycle2)
+
+searchElStr3([
+	1_: fixed_: stype_sheaf,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: link
+],,next_link)
+
+//#printNl([1_: /"PTS_LINK"/])
+//#printEl([1_: link])
+
+ifVarAssign([1_: link_set],,no_erase_link_set)
+eraseEl([1_: fixed_: link_set])
+label(no_erase_link_set)
+
+searchSetStr3([
+	1_: fixed_: link,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: temp,
+	set3_: assign_: link_set
+],,next_link)
+
+label(next_link_elem)
+ifVarAssign([1_: link_arc],,no_erase_link_arc)
+eraseEl([1_: fixed_: link_arc])
+label(no_erase_link_arc)
+searchElStr3([
+	1_: fixed_: link_set,
+	2_: assign_: const_: pos_: link_arc,
+	3_: assign_: const_: node_: link_elem
+],,next_link)
+ifCoin([1_: link_elem, 2_: value],next_link_elem)
+
+searchElStr3([
+	1_: fixed_: group_looked_throught,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: link_elem
+],next_link)
+
+genEl([1_: assign_: const_: node_: temp])
+genElStr3([
+	1_: fixed_: q_postorder_tree_search,
+	2_: assign_: const_: pos_: waitarc,
+	3_: fixed_: temp
+])
+genElStr3([
+	1_: fixed_: temp,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: link_elem
+])
+genElStr3([
+	1_: fixed_: question,
+	2_: assign_: const_: pos_:arc,
+	3_: fixed_: temp
+])
+genElStr3([
+	1_: fixed_: q_initiated,
+	2_: assign_: const_: pos_:arc,
+	3_: fixed_: temp
+])
+label(wait0)
+sys_wait([
+	1_: fixed_: catch_input_arc,
+	2_: fixed_: {1_: waitarc}
+])
+searchElStr5([
+	1_: fixed_: q_postorder_tree_search,
+	2_: fixed_: waitarc,
+	3_: fixed_: temp,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: rrel_answer_is_absent
+],next_link_elem)
+searchElStr5([
+	1_: fixed_: q_postorder_tree_search,
+	2_: fixed_: waitarc,
+	3_: fixed_: temp,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: rrel_answer_is_present
+],gen_good_result,wait0)
+
+label(cycle2)
+//#---------------------------------second cycle-------------------------------------
+searchSetStr3([
+	1_: fixed_: value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: temp,
+	set3_: assign_: set
+])
+//#searchSetStr3([
+//#	1_: assign_: const_: node_: temp,
+//#	2_: assign_: const_: pos_: arc,
+//#	3_: fixed_: value,
+//#	set1_: fixed_: set
+//#])
+ifVarAssign([1_: set],,gen_bad_result)
+
+label(next_link1)
+ifVarAssign([1_: inp_set_arc],,no_erase_inp_set_arc1)
+eraseEl([1_: fixed_: inp_set_arc])
+label(no_erase_inp_set_arc1)
+searchElStr3([
+	1_: fixed_: set,
+	2_: assign_: const_: pos_: inp_set_arc,
+	3_: assign_: const_: node_: link
+],,gen_bad_result)
+searchElStr3([
+	1_: fixed_: group_looked_throught,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: link
+],next_link1)
+searchElStr3([
+	1_: fixed_: stype_sheaf,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: link
+],next_link1)
+//#searchElStr3([
+//#	1_: fixed_: num_attr,
+//#	2_: assign_: const_: pos_: arc,
+//#	3_: fixed_: link
+//#],next_link1)
+searchElStr3([
+	1_: fixed_: stype_concept_norel,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: link
+],next_link1)
+searchElStr3([
+	1_: fixed_: stype_bin_orient_norole_rel,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: link
+],next_link1)
+searchElStr3([
+	1_: fixed_: stype_bin_orient_role_rel,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: link
+],next_link1)
+
+genEl([1_: assign_: const_: node_: temp])
+genElStr3([
+	1_: fixed_: q_postorder_tree_search,
+	2_: assign_: const_: pos_: waitarc,
+	3_: fixed_: temp
+])
+genElStr3([
+	1_: fixed_: temp,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: link
+])
+genElStr3([
+	1_: fixed_: question,
+	2_: assign_: const_: pos_:arc,
+	3_: fixed_: temp
+])
+genElStr3([
+	1_: fixed_: q_initiated,
+	2_: assign_: const_: pos_:arc,
+	3_: fixed_: temp
+])
+label(wait1)
+sys_wait([
+	1_: fixed_: catch_input_arc,
+	2_: fixed_: {1_: waitarc}
+])
+searchElStr5([
+	1_: fixed_: q_postorder_tree_search,
+	2_: fixed_: waitarc,
+	3_: fixed_: temp,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: rrel_answer_is_absent
+],next_link1)
+searchElStr5([
+	1_: fixed_: q_postorder_tree_search,
+	2_: fixed_: waitarc,
+	3_: fixed_: temp,
+	4_: assign_: const_: pos_: arc1,
+	5_: fixed_: rrel_answer_is_present
+],gen_good_result,wait1)
+
+label(gen_good_result_gpuc)
+
+callReturn([
+	1_:	fixed_: answer_make,
+	2_:	fixed_: {[
+			1_: input_value,
+			2_: res
+		]}
+],gen_good_result_final,gen_good_result_final)
+
+label(gen_good_result)
+callReturn([
+	1_: fixed_: search_bin_pair_end_proc,
+	2_: fixed_:
+		{[
+			1_: fixed_: temp,
+			2_: fixed_: nrel_answer,
+			3_: assign_: res
+		]}
+])
+callReturn([
+	1_:	fixed_: answer_make,
+	2_:	fixed_: {[
+			1_: input_value,
+			2_: res
+		]}
+],gen_good_result_final,gen_good_result_final)
+
+label(gen_good_result_final)
+genElStr3([
+	1_: fixed_: rrel_answer_is_present,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: v_v_arc
+],l_init,l_init)
+label(gen_bad_result)
+genElStr3([
+	1_: fixed_: rrel_answer_is_absent,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: v_v_arc
+],l_init,l_init)
+
+label(l_init)
+//#eraseEl([1_: fixed_: inputarc])
+
+label(exit)
+printNl([1_: exited])
+ifVarAssign([1_: set],,no_erase_set)
+eraseEl([1_: fixed_: set])
+label(no_erase_set)
+ifVarAssign([1_: link_set],,no_erase_link_set_end)
+eraseEl([1_: fixed_: link_set])
+label(no_erase_link_set_end)
+return()
+end

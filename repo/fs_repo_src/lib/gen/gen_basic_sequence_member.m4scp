@@ -1,0 +1,107 @@
+
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: gen_basic_sequence_member.m4scp
+// Description:
+// Файл содержит процедуру генерации переменной связки указанного отношения
+// 1-й аргумент - множество связок последовательности
+// 2-й аргумент - новая связка
+// 3-й аргумент - множество, содержащее все эелементы связок отношения
+// под атрибутом 2_ (если требуется)
+// 4-й аргумент - знак самого отношения
+/////////////////////////////////////////////////////
+// 		Author: Daniil Shunkevich
+//        Date: 14.12.11
+
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "ordinal.scsy"
+#include "lib_gen.scsy"
+#include "lib_search.scsy"
+
+procedure(gen_basic_sequence_member,
+[[
+]],
+[{	
+	a,b,set,arc,arc1,node,copy,seg,segments,member,temp,new_arc,next_temp
+}],
+{[
+	1_: in_: set,
+	2_: in_: member
+]}
+)
+sys_get_location([1_: set,2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+
+genElStr3([
+	1_: fixed_: set,
+	2_: assign_: const_: pos_: new_arc,
+	3_: fixed_: member
+])
+searchElStr5([
+	1_: fixed_: set,
+	2_: assign_: const_: pos_: perm_: arc,
+	3_: assign_: const_: node_: temp,
+	4_: assign_: const_: pos_: perm_: arc1,
+	5_: fixed_: 1_
+],no_first,first)
+
+label(first)
+genElStr3([
+	1_: fixed_: 1_,
+	2_: assign_: const_: pos_: perm_: arc,
+	3_: fixed_: new_arc
+],exit,exit)
+
+label(no_first)
+
+label(next_elem)
+callReturn([
+	1_: fixed_: search_bin_pair_end_proc,
+	2_: fixed_:
+		{[
+			1_: fixed_: temp,
+			2_: fixed_: nrel_basic_sequence,
+			3_: assign_: next_temp
+		]}
+])
+ifVarAssign([1_: next_temp],,next_no_exist)
+varAssign([1_: temp, 2_: next_temp],next_elem,next_elem)
+
+label(next_no_exist)
+
+callReturn([
+	1_: fixed_: gen_bin_pair,
+	2_: fixed_:
+		{[
+			1_: fixed_: temp,
+			2_: fixed_: member,
+			3_: fixed_: nrel_basic_sequence
+		]}
+],exit,exit)
+
+label(exit)
+return()
+end

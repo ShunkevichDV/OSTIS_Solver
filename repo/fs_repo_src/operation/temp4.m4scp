@@ -1,0 +1,86 @@
+
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: temp.m4scp
+// Description: File contains temporary program
+/////////////////////////////////////////////////////
+// 		Author: Daniil Shunkevich
+//        Date: 18.02.11
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "etc_questions_geometry.scsy"
+#include "lib_search.scsy"
+#include "lib_gen.scsy"
+#include "lib_answer.scsy"
+#include "meta_info.scsy"
+
+program(temp4,
+[[
+	sabc="/seb/planimetry/VM";
+	//#abc="/seb/planimetry/TR";
+	//#new="/seb/planimetry/New";
+	value="/seb/planimetry/A";
+	value1="/seb/planimetry/B";
+	value2="/seb/planimetry/BA1";
+	node=nrel_multiplication;
+//#	here=/"\n\nHandler setted!\n\n"/;
+]],
+[{
+	temp,arc,arc1,seg,segments,temp1
+}],
+{[
+]}
+)
+sys_get_location([1_: value,2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+
+genElStr3([
+	1_: fixed_: q_search_binary_relations_connecting_two_concept,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: node_: const_: temp
+])
+genElStr3([
+	1_: fixed_: temp,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: value
+])
+genElStr3([
+	1_: fixed_: temp,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: value1
+])
+genElStr3([
+	1_: fixed_: question,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: temp
+])
+genElStr3([
+	1_: fixed_: q_initiated,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: temp
+])
+return()
+end

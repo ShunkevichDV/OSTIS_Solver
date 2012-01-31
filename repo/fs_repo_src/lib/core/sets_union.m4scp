@@ -1,0 +1,166 @@
+
+/*-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+/////////////////////////////////////////////////////
+//        File: sets_union.m4scp
+// Description: File contains procedure to union 
+//				two sets
+/////////////////////////////////////////////////////
+// 		Author: Sergei Zalivako
+//        Date: 10.04.2011
+
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "meta_info.scsy"
+
+/*Procedure for union set1 and set2 to set3
+*/
+procedure(sets_union,
+[[	// constants
+
+	//#отладочная информация, закомментировать или убрать	
+	here=/"\n\nI have entered merge_sets!!!\n\n"/;
+	exited=/"\n\nI have exited merge_sets!!!\n\n"/;
+]],
+[{	// variables
+
+	// input
+	set1, set2,
+	// other
+	set, node,el,elements_set, arc, segments,seg, result_set
+	
+}],
+{[	// arguments
+	1_:	in_: set1,
+	2_: in_: set2	,
+	3_: in_: result_set
+]}
+)
+
+sys_get_location([1_: set1,2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+
+printNl([1_: here])
+
+// checking result set
+ifVarAssign([
+	1_: result_set
+], withoutResultGeneration)
+
+// generating result set if it not assigned
+genEl([
+	1_: assign_: node_: const_: result_set 
+])
+
+label( withoutResultGeneration )
+
+	// copy elements from set1 for processing
+	searchSetStr3([
+		1_: fixed_: set1,
+		2_: assign_: arc,
+		3_: assign_: node,
+		set3_: assign_: elements_set
+	], , , goto_error)
+
+// iterate elements of set1 and append them into result set
+label(process_set1)
+
+	// search some element in copy of set1
+	searchElStr3([
+		1_: fixed_: elements_set,
+		2_: assign_: arc,
+		3_: assign_: el
+	], , make_copy, goto_error)
+
+	// erase arc from copy of set1 to viewed element
+	eraseElStr3([
+		1_: fixed_: elements_set,
+		2_: assign_: f_: arc,
+		3_: fixed_: el
+	])
+
+	// search viewed element in result set
+	searchElStr3([
+		1_: fixed_: result_set,
+		2_: assign_: arc,
+		3_: fixed_: el
+	], process_set1 )
+	
+	// add viewed element into result set
+	genElStr3([
+		1_: fixed_: result_set,
+		2_: assign_: const_: pos_: arc_: arc,
+		3_: fixed_: el
+	], process_set1, , goto_error)
+
+label(make_copy)
+	// copy elements from set2 for processing
+	searchSetStr3([
+		1_: fixed_: set2,
+		2_: assign_: arc,
+		3_: assign_: node,
+		set3_: assign_: elements_set
+	], , , goto_error)
+
+// iterate elements of set2 and append them into result set
+label(process_set2)
+
+	// search some element in copy of set2
+	searchElStr3([
+		1_: fixed_: elements_set,
+		2_: assign_: arc,
+		3_: assign_: el
+	], , goto_finish, goto_error)
+
+	// erase arc from copy of set2 to viewed element
+	eraseElStr3([
+		1_: fixed_: elements_set,
+		2_: assign_: f_: arc,
+		3_: fixed_: el
+	])
+
+	// search viewed element in result set
+	searchElStr3([
+		1_: fixed_: result_set,
+		2_: assign_: arc,
+		3_: fixed_: el
+	], process_set2 )
+	
+	// add viewed element into result set
+	genElStr3([
+		1_: fixed_: result_set,
+		2_: assign_: const_: pos_: arc_: arc,
+		3_: fixed_: el
+	], process_set2, , goto_error)
+
+label(goto_error)
+//!	FIXME:	add error processing (garbage cleaning)
+
+label(goto_finish)
+
+eraseEl([1_: fixed_: elements_set])
+
+printNl([1_: exited])
+
+return()
+end()

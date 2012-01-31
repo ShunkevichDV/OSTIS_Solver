@@ -1,0 +1,350 @@
+
+/* -----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2011 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modfirst_ely
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  first_el not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+// ///////////////////////////////////////////////////
+//        File: equals.m4scp
+// Description: Файл содержит операцию сравнения одной 
+//              величины величин c величинами из 
+//              некоторого множества на равенство
+// ///////////////////////////////////////////////////
+// 		Author: Sergei Zalivako
+//        Date: 23.06.2011 
+
+#include "scp_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "com_keynodes.scsy"
+#include "lib_search.scsy"
+#include "lib_check.scsy"
+#include "lib_gen.scsy"
+#include "lib_answer.scsy"
+#include "lib_set.scsy"
+
+program(init_op,
+[[
+	// Вызываемая SCP-программа
+	equals;
+	// Ключевой узел, обозначающий инициированный вопрос
+	q_initiated;
+	// Событие, на которое реагирует обработчик(проведение выходящей дуги из узла)
+	catch_output_arc;
+	group_arifmetic_descr;
+]],
+[{
+	descr,arc
+}],
+{[
+]}
+)
+// Установка обработчика события на проведение дуги  из узла "инициированный запрос" 
+sys_set_event_handler([
+	1_: fixed_: catch_output_arc,
+	2_: fixed_: equals,
+	3_: fixed_: {1_: q_initiated},
+	4_: assign_: descr
+])
+
+genElStr3([
+	1_: fixed_: group_arifmetic_descr,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: descr
+])
+
+return()	
+end
+
+
+procedure(equals,
+[[
+	// Ключевой узел, обозначающий запрос
+	q_arifmetic_routine;
+
+	// Атрибут присутствия ответа
+	rrel_answer_is_present;
+	
+	// Атрибут того, что операция выполнилась
+	rrel_operation_is_over;
+
+	// Ключевой узел отношения равенство в базе знаний
+	nrel_equals;
+	
+	// Процедура проверки единиц измерения
+	check_unit_of_measure;
+	
+	// Процедура поиска значения величины
+	search_quantity_value;
+	
+	// Процедура генерации значения величины
+	gen_quantity_value;
+	
+	// Атрибут для обозначения десятичного числа
+	rrel_decimal_number;
+	
+	// Процедура для генерации ответа
+	answer_make;
+	
+]],
+[{
+	handler, element, questionNode,
+	arcFromRequest, arcFromQuestion,
+	location, segments, checkingNode,
+	equalsLink, equalsLinkCopy,
+	valuesCopy, valueForComparison,
+	currentElementValue, currentElement,
+	arcForChecking, arcVar, attributeArc, nodeVar,
+	answer
+	
+}],
+{[
+	1_: in_: handler, 
+	2_: in_: element, 
+	3_: in_: arcFromQuestion, 
+	4_: in_: questionNode 
+]}
+)
+// Получение сегмента, в кототором находится узел связки запроса арифметического действия
+sys_get_location([
+	1_: fixed_: questionNode,
+	2_: assign_: location
+])
+
+// Установка найденного сегмента как основного
+sys_set_default_segment([
+	1_: fixed_: location
+])
+
+// Разворачивание установленного сегмента
+sys_spin_segment([
+	1_: fixed_: location,
+	2_: assign_: segments
+])
+
+// Проверяем, что в узел запроса проведена дуга из узла "запрос арифметического действия"
+searchElStr3([
+	1_: fixed_: q_arifmetic_routine,
+	2_: assign_: const_: pos_: arc_: arcFromRequest,
+	3_: fixed_: questionNode
+], , finishOperation)
+
+// Находим связку отношения больше из вопроса
+searchElStr3([
+	1_: fixed_: questionNode,
+	2_: assign_: const_: pos_: arc_: arcForChecking,
+	3_: assign_: const_: node_: equalsLink
+], , finishOperation)
+
+// Проверяем, что связка, в которую была проведена дуга из запроса явлется именно связкой отношения равенства
+searchElStr3([
+	1_: fixed_: nrel_equals,
+	2_: assign_: const_: pos_: actual_: arc_: arcForChecking,
+	3_: fixed_: equalsLink
+], , finishOperation)
+
+// Поиск связки вопроса с атрибутом "присутствует ответ_"
+// Если такой атрибут есть, то работа программы прекращается
+searchElStr5([
+	1_: fixed_: q_arifmetic_routine,
+	2_: fixed_: arcFromRequest,
+	3_: fixed_: questionNode,
+	4_: assign_: arc_: const_: pos_: actual_: arcVar,
+	5_: fixed_: rrel_answer_is_present
+], exit)
+
+// Делаем копию связки отношения равенства для проверки единиц измерения входящих в него компонентов
+searchSetStr3([
+	1_: fixed_: equalsLink,
+	2_: assign_: arc_: const_: pos_: actual_: arcVar,
+	3_: assign_: node_: const_: nodeVar,
+	set3_: assign_: node_: const_: equalsLinkCopy
+])
+
+// Проверяем единицы измерения всех компонентов отношения равенства
+callReturn([
+	1_: fixed_: check_unit_of_measure,
+	2_: fixed_: {[
+		1_: equalsLinkCopy,
+		2_: checkingNode
+	]}
+])
+
+// Проверяем результат выполнения процедуры проверки единиц измерения
+ifVarAssign([
+	1_: checkingNode
+], , exit)
+
+// Делаем копию множества сравниваемых величин
+searchSetStr3([
+	1_: fixed_: equalsLink,
+	2_: assign_: arc_: const_: pos_: actual_: arcVar,
+	3_: assign_: const_: node_: nodeVar,
+	set3_: assign_: const_: node_: valuesCopy
+])
+
+// Создаем узел, значением которого будет являться значение для сравнения
+genEl([
+	1_: assign_: const_: node_: valueForComparison
+])
+
+// Просмотр множества сравниваемых величин
+label(valuesView)
+	
+	// Находим очередную величину для сравнения
+	searchElStr3([
+		1_: fixed_: valuesCopy,
+		2_: assign_: arc_: const_: pos_: actual_: arcVar,
+		3_: assign_: const_: node_: currentElementValue
+	], , calculationSuccess)
+	
+	// Удаляем дугу к найденной величине
+	eraseEl([
+		1_: fixed_: f_: arcVar
+	])
+	
+	// Находим значение очередной величины для сравнения
+	callReturn([
+		1_: fixed_: search_quantity_value,
+		2_: fixed_: {[
+			1_: currentElementValue,
+			2_: currentElement
+		]}
+	])
+	
+	// Проверяем значение очередной величины для сравнения
+	ifVarAssign([
+		1_: currentElement
+	], , exit)
+	
+	// Проверяем значение узла, содержимым которого является значение для сравнения
+	ifFormCont([
+		1_: valueForComparison
+	], , genValue)
+	
+	// Сравниваем очередную величину с величиной не из множества
+	ifEq([
+		1_: fixed_: currentElement,
+		2_: fixed_: valueForComparison
+	], valuesView, exit)
+	
+	// Заносим в узел для проверки значений значение первой найденной величины
+	label(genValue)
+		contAssign([
+			1_: fixed_: valueForComparison,
+			2_: fixed_: currentElement
+		], valuesView, valuesView)
+	
+
+// Вычисление осуществлено успешно
+label(calculationSuccess)
+	
+	printNl([
+		1_: fixed_: /"Equals is true"/
+	])
+	
+	// Генерируем факт присутствия ответа
+	genElStr5([
+		1_: fixed_: q_arifmetic_routine,
+		2_: fixed_: arcFromRequest,
+		3_: fixed_: questionNode,
+		4_: assign_: arc_: const_: pos_: actual_: arcVar,
+		5_: fixed_: rrel_answer_is_present
+	], makingAnswer, makingAnswer)
+
+// Неуспешное выполнение операции
+label(exit)
+
+	printNl([
+		1_: fixed_: /"Equals is false"/
+	])
+
+// Формирование ответа на запрос 
+label(makingAnswer)
+
+	// Генерируем узел для вывода ответа
+	genEl([
+		1_: assign_: const_: node_: answer
+	])
+		
+	// Добавляем в ответ узел запроса
+	genElStr3([
+		1_: fixed_: answer,
+		2_: assign_: const_: pos_: arc_: arcVar,
+		3_: fixed_: q_arifmetic_routine
+	])
+	
+	// Добавляем в ответ дугу из узла запроса
+	genElStr3([
+		1_: fixed_: answer,
+		2_: assign_: const_: pos_: arc_: arcVar,
+		3_: fixed_: arcFromRequest
+	])
+	
+	// Добавляем в ответ связку запроса
+	genElStr3([
+		1_: fixed_: answer,
+		2_: assign_: const_: pos_: arc_: arcVar,
+		3_: fixed_: questionNode
+	])
+	
+	// Если дуга из узла "присутствует ответ_" не проводилась
+	ifVarAssign([
+		1_: attributeArc
+	], , withoutAnswerIsPresent)
+	
+	// Добавляем в ответ узел "присутствует ответ_"
+	genElStr3([
+		1_: fixed_: answer,
+		2_: assign_: const_: pos_: arc_: arcVar,
+		3_: fixed_: rrel_answer_is_present
+	])
+	
+	// Добавляем в ответ дугу из узла "присутствует ответ_"
+	genElStr3([
+		1_: fixed_: answer,
+		2_: assign_: const_: pos_: arc_: arcVar,
+		3_: fixed_: attributeArc
+	])
+	
+// Создание ответа операции
+label(withoutAnswerIsPresent)
+	
+	// Генерация ответа операции
+	callReturn([
+		1_:	fixed_: answer_make,
+		2_:	fixed_: {[
+			1_: questionNode,
+			2_: answer
+		]}
+	])
+	
+	// Генерируем факт выполнения операции
+	genElStr5([
+		1_: fixed_: q_arifmetic_routine,
+		2_: fixed_: arcFromRequest,
+		3_: fixed_: questionNode,
+		4_: assign_: arc_: const_: pos_: actual_: arcVar,
+		5_: fixed_: rrel_operation_is_over
+	])
+	
+label(finishOperation)
+
+return()
+	
+end

@@ -1,0 +1,259 @@
+
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2011 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modfirst_ely
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+/////////////////////////////////////////////////////
+//        File: conclusion_fragmentation.m4scp
+// Description: Файл содержит операцию
+//				фрагметнтации заключения
+/////////////////////////////////////////////////////
+// 		Author: Startsev Sergei
+//        Date: 08.04.2011 
+
+#include "scp_keynodes.scsy"
+#include "lib_search.scsy"
+#include "lib_gen.scsy"
+#include "lib_set.scsy"
+#include "lib_other.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "meta_info.scsy"
+
+/////////////////////////////////////////////////////
+
+program(init_op,
+[[
+	
+	first=1_;
+	second=2_;
+	//#link="/seb/planimetry/Теорема Пифагора";
+	catch_output_arc;
+	q_initiated;
+]],
+[{
+	nodeVar,seg,segments
+}],
+{[
+]}
+)
+
+sys_get_location([1_: link,2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+
+//#callReturn([1_: fixed_: fragmentation,
+//#	    2_: fixed_:
+//#		{[
+//#			1_: fixed_: link
+//#		]}
+//#])
+sys_set_event_handler([
+	1_: fixed_: catch_output_arc,
+	2_: fixed_: conclusion_fragmentation,
+	3_: fixed_: {1_: q_initiated},
+	4_: assign_: nodeVar
+])
+
+return()
+end
+/////////////////////////////////////////////////////
+
+
+
+/////////////////////////////////////////////////////
+
+procedure(conclusion_fragmentation,
+[[			
+	q_conclusion_fragmentation;
+	
+	//#отладочная информация, закомментировать или убрать
+	here=/"\n\nI have entered fragmentation!!!\n\n"/;
+	exited=/"\n\nI have exited fragmentation!!!\n\n"/;
+	find_th=/"\n\nsearch_node_theory is OK!!!\n\n"/;
+	not_find_th=/"\n\nsearch_node_theory is ERROR!!!\n\n"/;
+	find_obs=/"\n\nsearch_node_objects is OK!!!\n\n"/;
+	not_find_obs=/"\n\nsearch_node_objects is ERROR!!!\n\n"/;
+	find_if_then=/"\n\nsearch_first_and_second is OK!!!\n\n"/;
+	not_find_if_then=/"\n\nsearch_first_and_second is ERROR!!!\n\n"/;
+	find_linked=/"\n\nsearch_linked_nodes is OK!!!\n\n"/;
+	not_find_linked=/"\n\nsearch_linked_nodes is ERROR!!!\n\n"/;	
+]],
+[{	
+	relations_set,el,inputarc,arc,arc1,req_arc,value,handler,element,
+	seg,segments,temp,set,set2,t,const_then,theory,objects,if,then,linked,right_arc,
+	section,attr,result,fragments,simple_fragments,descr,my_arc,bin_orient_relations_set
+}],
+{[
+	1_: in_: handler,
+	2_: in_: element,
+	//#проведенная дуга
+	3_: in_: inputarc,
+	//#узел, к которому проведена дуга
+	4_: in_: value
+]}
+)
+sys_get_location([1_: value,2_: assign_: seg])
+//#printEl([1_: value])
+//#printEl([1_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+
+printNl([1_: here])
+
+/////////////////////////////////////////////////////
+//#проверка вызова
+searchElStr3([
+	1_: fixed_: q_conclusion_fragmentation,
+	2_: assign_: const_: pos_: req_arc,
+	3_: fixed_: value
+],,exit)
+searchElStr3([
+	1_: fixed_: value,
+	2_: assign_: const_: pos_: arc,
+	3_: assign_: const_: node_: value
+],,exit)
+/////////////////////////////////////////////////////
+printEl([1_: value])
+/////////////////////////////////////////////////////
+callReturn([1_: fixed_: search_first_and_second,
+	    2_: fixed_:
+		{[
+			1_: fixed_: value,			
+			2_: assign_: if,
+			3_: assign_: then
+		]}
+])
+
+ifVarAssign([1_: if],l_find_if,l_not_find_if)
+
+label(l_not_find_if)
+printNl([1_: not_find_if_then],bad,bad)
+
+label(l_find_if)
+printNl([1_: find_if_then])
+
+ifVarAssign([1_: then],l_find_then,l_not_find_then)
+
+label(l_not_find_then)
+printNl([1_: not_find_if_then],bad,bad)
+
+label(l_find_then)
+printNl([1_: find_if_then])
+/////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////
+callReturn([1_: fixed_: gen_fragmented_bin_orient_relations,
+	    2_: fixed_:
+		{[
+			1_: fixed_: then,
+			2_: assign_: bin_orient_relations_set		
+		]}
+])
+/////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////
+callReturn([1_: fixed_: gen_fragmented_relations,
+	    2_: fixed_:
+		{[
+			1_: fixed_: then,
+			2_: assign_: relations_set		
+		]}
+])
+/////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////
+callReturn([1_: fixed_: gen_simple_fragments,
+	    2_: fixed_:
+		{[
+			1_: fixed_: then,
+			2_: assign_: simple_fragments
+		]}
+])
+/////////////////////////////////////////////////////
+
+genEl([1_: const_: node_: assign_: fragments])
+
+/////////////////////////////////////////////////////
+callReturn([1_: fixed_: sets_union,
+	    2_: fixed_:
+		{[
+			1_: fixed_: bin_orient_relations_set,
+			2_: fixed_: fragments,
+			3_: assign_: fragments
+		]}
+])
+/////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////
+callReturn([1_: fixed_: sets_union,
+	    2_: fixed_:
+		{[
+			1_: fixed_: relations_set,
+			2_: fixed_: fragments,
+			3_: assign_: fragments
+		]}
+])
+/////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////
+callReturn([1_: fixed_: sets_union,
+	    2_: fixed_:
+		{[
+			1_: fixed_: simple_fragments,
+			2_: fixed_: fragments,
+			3_: assign_: fragments
+		]}
+])
+/////////////////////////////////////////////////////
+
+//#printEl([1_:fragments])
+/////////////////////////////////////////////////////
+
+searchElStr3([
+	1_: fixed_: value,
+	2_: assign_: const_: pos_: right_arc,
+	3_: fixed_: then
+])
+
+genElStr3([
+	1_: fixed_: value,
+	2_: fixed_: right_arc,
+	3_: fixed_: fragments
+])
+eraseEl([1_: fixed_: then])
+
+genElStr3([
+	1_: fixed_: nrel_conj,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: fragments
+])
+genElStr3([
+	1_: fixed_: rrel_answer_is_present,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: req_arc
+])
+label(exit)
+
+printNl([1_: exited])
+
+return()
+end

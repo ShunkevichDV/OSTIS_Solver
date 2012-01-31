@@ -1,0 +1,482 @@
+// 
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "lib_search.scsy"
+#include "meta_info.scsy"
+
+procedure(gen_fragmented_bin_orient_relations,
+[[	
+	first=1_;
+	second=2_;
+	set_attr=set_;
+	fixed_attr=fixed_;
+	stype_element;	
+	
+	//#отладочная информация, закомментировать или убрать	
+	here=/"\n\nI have entered gen_fragmented_bin_orient_relations!!!\n\n"/;
+	exited=/"\n\nI have exited gen_fragmented_bin_orient_relations!!!\n\n"/;
+	found=/"\n\nI found relation!!!\n\n"/;
+	current_rel=/"\n\ncurrent relation\n"/;
+	
+]],
+[{	
+	arc,arc1,arc2,node,node1,general_set,result_set,seg,segments,set,element,first_el,second_el,first_arc,second_arc,first_attr_arc,second_attr_arc,
+	probably_sheafs,probably_sheaf,probably_arc,probably_first_attr_arc,probably_second_attr_arc,probably_first_el_arc,probably_second_el_arc,probably_second_el,
+	elements_set,element_arc,relations_set,relation,sheaf_set,sheaf,sheaf_arc,attributes_set,attr,attr_arc,fragment
+}],
+{[		
+	1_: in_: general_set,	
+	2_: out_: result_set
+]}
+)
+sys_get_location([1_: general_set,2_: assign_: seg])
+sys_set_default_segment([1_: fixed_: seg])
+sys_spin_segment([1_: fixed_: seg,	2_: assign_: segments])
+
+printNl([1_: here])
+
+///////////////////////////////////////
+
+genEl([1_: const_: node_: assign_: result_set])
+
+///////////////////////////////////////
+
+//#поиск отношений
+callReturn([1_: fixed_: search_relations,
+	    2_: fixed_:
+		{[
+			1_: fixed_: general_set,			
+			2_: assign_: relations_set		
+		]}
+])
+
+//#перебираем элементы-отношения
+label(next)
+
+ifVarAssign([1_: relation],,noerase)
+eraseElStr3([
+	1_: fixed_: relations_set,
+	2_: assign_: f_: arc,
+	3_: fixed_: relation
+])
+//#удаляем найденное отношение из входного множества
+//#eraseElStr3([
+//#	1_: fixed_: general_set,
+//#	2_: assign_: f_: arc,
+//#	3_: fixed_: relation
+//#])
+
+label(noerase)
+
+searchElStr3([
+	1_: fixed_: relations_set,
+	2_: assign_: arc,
+	3_: assign_: relation
+],,exit)
+
+//#если у отношения есть хотя бы одна связка, идем дальше, иначе переходим к другому отношению
+searchElStr5([
+	1_: fixed_: relation,
+	2_: assign_: arc,
+	3_: assign_: node,
+	4_: assign_: arc1,
+	5_: fixed_: general_set
+],,next)
+
+//#printNl([1_: current_rel])
+//#printEl([1_: relation])
+
+///////////////////////////////////////
+
+//#поиск связок отношения
+callReturn([1_: fixed_: search_sheafs,
+	    2_: fixed_:
+		{[
+			1_: fixed_: relation,
+			2_: fixed_: general_set,
+			3_: assign_: sheaf_set
+		]}
+])
+
+//#перебираем элементы-связки
+label(next2)
+
+ifVarAssign([1_: sheaf],,noerase2)
+eraseElStr3([
+	1_: fixed_: sheaf_set,
+	2_: assign_: f_: arc,
+	3_: fixed_: sheaf
+])
+//#удаляем найденную связку из входного множества
+//#eraseElStr3([
+//#	1_: fixed_: general_set,
+//#	2_: assign_: f_: arc,
+//#	3_: fixed_: sheaf
+//#])
+
+label(noerase2)
+
+searchElStr3([
+	1_: fixed_: sheaf_set,
+	2_: assign_: sheaf_arc,
+	3_: assign_: sheaf
+],,next)
+
+//#если у связки есть хотя бы один элемент, идем дальше, иначе переходим к следующей связке
+searchSetStr5([
+	1_: fixed_: sheaf,
+	2_: assign_: arc,
+	3_: assign_: node,
+	4_: assign_: arc1,
+	5_: fixed_: general_set,
+	set3_: assign_: elements_set
+],,next2)
+
+//#ищем элемент под атрибутом 1_
+searchElStr5([
+	1_: fixed_: sheaf,
+	2_: assign_: first_arc,
+	3_: assign_: first_el,
+	4_: assign_: first_attr_arc,
+	5_: fixed_: first
+],,next2)
+
+//#ищем элемент под атрибутом 2_
+searchElStr5([
+	1_: fixed_: sheaf,
+	2_: assign_: second_arc,
+	3_: assign_: second_el,
+	4_: assign_: second_attr_arc,
+	5_: fixed_: second
+],,next2)
+
+//#удаляем из элементов первый
+eraseElStr3([
+	1_: fixed_: elements_set,
+	2_: assign_: f_: arc,
+	3_: fixed_: first_el
+])
+
+//#удаляем из элементов второй
+eraseElStr3([
+	1_: fixed_: elements_set,
+	2_: assign_: f_: arc,
+	3_: fixed_: second_el
+])
+
+//#если в элементах связки после удаления 1-го и 2-го элементов что-то осталось, то это не бинарное отношение и переходим к другому отношению
+searchElStr3([
+	1_: fixed_: elements_set,
+	2_: assign_: arc,
+	3_: assign_: element
+],next2)
+
+///////////////////////////////////////
+//#printNl([1_: current_rel])
+//#printEl([1_: relation])
+
+//#создаем новый фрагмент
+genEl([1_: const_: node_: assign_: fragment])
+
+//#добавляем фрагмент в результирующее множество
+genElStr3([
+	1_: fixed_: result_set,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: fragment
+])
+
+//#добавляем отношение в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: relation
+])
+
+//#ищем дугу, соединяющую отношение и его связку
+searchElStr3([
+	1_: fixed_: relation,
+	2_: assign_: sheaf_arc,
+	3_: fixed_: sheaf
+],,)
+
+//#удаляем найденную дугу из входного множества
+eraseElStr3([
+	1_: fixed_: general_set,
+	2_: assign_: f_: arc,
+	3_: fixed_: sheaf_arc
+])
+
+//#добавляем найденную связку в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: sheaf
+])
+
+//#добавляем найденную дугу в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: sheaf_arc
+])
+
+///////////////////////////////////////
+//#все, что касется 1-го элемента
+
+//#добавляем 1-ый элемент в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: first_el
+])
+
+//#добавляем дугу между связкой и 1-м элементом в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: first_arc
+])
+
+//#удаляем дугу между связкой и 1-м элементом из входного множества
+eraseElStr3([
+	1_: fixed_: general_set,
+	2_: assign_: f_: arc,
+	3_: fixed_: first_arc
+])
+
+//#добавляем атрибут 1_ в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: first
+])
+
+//#добавляем дугу атрибута 1_ в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: first_attr_arc
+])
+
+//#удаляем дугу атрибута 1_ из входного множества
+eraseElStr3([
+	1_: fixed_: general_set,
+	2_: assign_: f_: arc,
+	3_: fixed_: first_attr_arc
+])
+///////////////////////////////////////
+
+///////////////////////////////////////
+//#все, что касется 2-го элемента
+
+//#добавляем 2-ой элемент в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: second_el
+])
+
+//#добавляем дугу между связкой и 2-м элементом в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: second_arc
+])
+
+//#удаляем дугу между связкой и 2-м элементом из входного множества
+eraseElStr3([
+	1_: fixed_: general_set,
+	2_: assign_: f_: arc,
+	3_: fixed_: second_arc
+])
+
+//#добавляем атрибут 2_ в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: second
+])
+
+//#добавляем дугу атрибута 2_ в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: second_attr_arc
+])
+
+//#удаляем дугу атрибута 2_ из входного множества
+eraseElStr3([
+	1_: fixed_: general_set,
+	2_: assign_: f_: arc,
+	3_: fixed_: second_attr_arc
+])
+///////////////////////////////////////
+
+//#поиск связок, где под атрибутом 1_ стоит first_el
+searchSetStr5([
+	1_: assign_: node,
+	2_: assign_: arc,
+	3_: fixed_: first_el,
+	4_: assign_: arc1,
+	5_: fixed_: first,	
+	set1_: assign_: probably_sheafs
+],,next2)
+
+//#сразу удаляем текущую связку, чтобы не рассматривать
+eraseElStr3([
+	1_: fixed_: probably_sheafs,
+	2_: assign_: f_: arc,
+	3_: fixed_: sheaf
+])
+
+//#перебираем связки
+label(next3)
+
+ifVarAssign([1_: probably_sheaf],,noerase3)
+eraseElStr3([
+	1_: fixed_: probably_sheafs,
+	2_: assign_: f_: arc,
+	3_: fixed_: probably_sheaf
+])
+label(noerase3)
+
+searchElStr3([
+	1_: fixed_: probably_sheafs,
+	2_: assign_: arc,
+	3_: assign_: probably_sheaf
+],,next2)
+
+//#нас интересует только связка, принадлежащая входному мн-ву
+searchElStr3([
+	1_: fixed_: general_set,
+	2_: assign_: arc,
+	3_: fixed_: probably_sheaf
+],,next3)
+
+//#находим дугу, соединяющую отношение и связку
+searchElStr3([
+	1_: fixed_: relation,
+	2_: assign_: probably_arc,
+	3_: fixed_: probably_sheaf
+],,next3)
+
+///////////////////////////////////////
+//#нашли подходящую связку
+
+//#поиск дуг
+searchElStr5([
+	1_: fixed_: probably_sheaf,
+	2_: assign_: probably_first_el_arc,
+	3_: fixed_: first_el,
+	4_: assign_: probably_first_attr_arc,
+	5_: fixed_: first
+])
+
+//#добавляем найденную связку в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: probably_sheaf
+])
+
+//#удаляем найденную связку из текущих связок
+eraseElStr3([
+	1_: fixed_: sheaf_set,
+	2_: assign_: f_: arc,
+	3_: fixed_: probably_sheaf
+])
+
+//#добавляем найденную дугу в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: probably_arc
+])
+
+//#удаляем найденную дугу из входного множества
+eraseElStr3([
+	1_: fixed_: general_set,
+	2_: assign_: f_: arc,
+	3_: fixed_: probably_arc
+])
+
+//#добавляем найденную дугу в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: probably_first_el_arc
+])
+
+//#удаляем найденную дугу из входного множества
+eraseElStr3([
+	1_: fixed_: general_set,
+	2_: assign_: f_: arc,
+	3_: fixed_: probably_first_el_arc
+])
+
+//#добавляем найденную дугу в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: probably_first_attr_arc
+])
+
+//#удаляем найденную дугу из входного множества
+eraseElStr3([
+	1_: fixed_: general_set,
+	2_: assign_: f_: arc,
+	3_: fixed_: probably_first_attr_arc
+])
+
+///////////////////////////////////////
+//#поиск второго элемента
+searchElStr5([
+	1_: fixed_: probably_sheaf,
+	2_: assign_: probably_second_el_arc,
+	3_: assign_: probably_second_el,
+	4_: assign_: probably_second_attr_arc,
+	5_: fixed_: second
+])
+
+//#добавляем второй элемент в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: probably_second_el
+])
+
+//#добавляем найденную дугу в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: probably_second_el_arc
+])
+
+//#удаляем найденную дугу из входного множества
+eraseElStr3([
+	1_: fixed_: general_set,
+	2_: assign_: f_: arc,
+	3_: fixed_: probably_second_el_arc
+])
+
+//#добавляем найденную дугу в фрагмент
+genElStr3([
+	1_: fixed_: fragment,
+	2_: assign_: const_: pos_: arc,
+	3_: fixed_: probably_second_attr_arc
+])
+
+//#удаляем найденную дугу из входного множества
+eraseElStr3([
+	1_: fixed_: general_set,
+	2_: assign_: f_: arc,
+	3_: fixed_: probably_second_attr_arc
+],next3,next3)
+///////////////////////////////////////
+
+label(exit)
+
+printNl([1_: exited])
+return()
+end

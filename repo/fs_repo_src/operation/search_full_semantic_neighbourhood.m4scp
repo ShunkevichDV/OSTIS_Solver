@@ -1,0 +1,525 @@
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+//------------------------------------------------------------------------------
+//         File: search_full_semantic_neighbourhood.m4scp
+//  Description: File contains operation for search of full semantic
+//               neighbourhood.
+//------------------------------------------------------------------------------
+//               Author: Житко Владимир Александрович
+//         Date: 22.05.10
+//------------------------------------------------------------------------------
+// Modification: 17.11.11, Ivan Kosik - //~ внесенные изменения
+
+#include "scp_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "com_keynodes.scsy"
+#include "_keynodes.scsy"
+#include "lib_search.scsy"
+#include "lib_set.scsy"
+#include "lib_answer.scsy"
+///////////////////////////////////////////////////////////////Program Beginning
+// program that initialize operation
+program(init_op,
+[[
+	q_initiated;
+	run_op;
+	catch_output_arc;
+]],
+[{
+}]
+)
+
+printNl([ 1_: fixed_: /"\nTest: search_full_semantic_neighbourhood: program: init_op: point 1.1\n"/ ])
+
+// subscribe to handle output pairs from "initiated question" node
+sys_set_event_handler([
+	1_: fixed_: catch_output_arc,
+	2_: fixed_: run_op,
+	3_: fixed_: { 1_: q_initiated }
+])
+
+printNl([ 1_: fixed_: /"\nTest: search_full_semantic_neighbourhood: program: init_op: point 1.2\n"/ ])
+
+return()
+end
+/////////////////////////////////////////////////////////////////////Program End
+/////////////////////////////////////////////////////////////Procedure Beginning
+// procedure that process question and make answer
+procedure(run_op,
+[[
+	q_search_full_semantic_neighbourhood;
+	search_full_semantic_neighbourhood;
+	//#set_rm_el; //~ ?
+	//#search_base_cycle; //~ ?
+]],
+[{
+	// input parameters
+	descr, element, arc, question_node,
+	// other variables
+	segment, arc2, result, descr2
+}],
+{[
+	1_: in_: descr,
+	2_: in_: element,
+	3_: in_: arc,
+	4_: in_: question_node
+]}
+)
+
+printNl([ 1_: fixed_: /"\nTest: search_full_semantic_neighbourhood: procedure: run_op: point 2.1\n"/ ])
+//~
+printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: run_op: point 3300: RUNTIME ERROR\n"/ ])
+//#printEl([ 1_: fixed_: question_node ])
+
+// need to set segment that contains question node as default to generate
+// answer in it
+sys_get_location([ 1_: fixed_: question_node, 2_: assign_: segment ])
+sys_open_segment([ 1_: fixed_: segment ])
+sys_set_default_segment([ 1_: fixed_: segment ])
+
+searchElStr3([
+	1_:  fixed_: q_search_full_semantic_neighbourhood,
+	2_: assign_: const_: pos_: arc_: arc2,
+	3_:  fixed_: question_node
+], , goto_end)
+//~
+printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: run_op: point 3300: RUNTIME ERROR\n"/ ])
+//#printEl([ 1_: fixed_: question_node ])
+
+// call cycle to find full semantic neighbourhood for all elements in a question
+callReturn([
+	1_: fixed_: search_base_cycle,
+	2_: fixed_: {[
+		1_: question_node,
+		2_: search_full_semantic_neighbourhood,
+		3_: result
+	]}
+], , , , goto_error) //~ descr2
+
+// remove question node from result
+callReturn([
+	1_: fixed_: set_rm_el,
+	2_: fixed_: {[
+		1_: result,
+		2_: question_node
+	]}
+], , , , goto_error) //~ descr2
+
+// make answer
+callReturn([
+	1_: fixed_: answer_make,
+	2_: fixed_: {[
+		1_: question_node,
+		2_: result
+	]}
+], , , , goto_error) //~ descr2
+
+printNl([ 1_: fixed_: /"\nTest: search_full_semantic_neighbourhood: procedure: run_op: point 2.2: result\n"/ ])
+//#printEl([ 1_: fixed_: result ])
+return()
+
+label(goto_error)
+printNl([ 1_: fixed_: /"\nTest: search_full_semantic_neighbourhood: procedure: run_op: point 2.3: RUNTIME ERROR\n"/ ])
+
+label(goto_end)
+return()
+end
+///////////////////////////////////////////////////////////////////Procedure End
+/////////////////////////////////////////////////////////////Procedure Beginning
+// procedure that search for full semantic neighbourhood
+procedure(search_full_semantic_neighbourhood,
+[[
+	f_local_rel = "/operation/search_full_semantic_neighbourhood/search_semantic_local_rel_chek";
+
+	rel = "/info/stype_bin_orient_norole_rel";
+	family = "/info/stype_concept_norel";
+	struct = "/info/stype_struct";
+	subj = "/info/stype_ext_obj_abstract";
+	example = "/etc/com_keynodes/пример_";
+]],
+[{
+	result_set, question_node, target_rel, descr, arc,
+	arc1, arc2, arc3, node1, node2, set1, set2, example_set, node3, arc4
+}],
+{[
+	1_: in_: question_node,
+	2_: in_: out_: result_set
+]}
+)
+
+// получаем все связки отношений у заданного объекта
+searchSetStr5([
+	1_: assign_: node_: const_: node1,
+	2_: assign_: arc_: pos_: const_: arc1, //~ arc2
+	3_:  fixed_: question_node,
+	4_: assign_: arc_: pos_: const_: arc2, //~ arc4
+	5_:  fixed_: 1_,
+	set1_: assign_: set1
+])
+searchSetStr5([
+	1_: assign_: node_: const_: node1,
+	2_: assign_: arc_: pos_: const_: arc1, //~ arc2
+	3_:  fixed_: question_node,
+	4_: assign_: arc_: pos_: const_: arc2, //~ arc4
+	5_:  fixed_: 2_,
+	set1_: fixed_: set1
+])
+
+// вызываем процедуру поиска и добавления к результирующему множеству всех
+// элементов бинарных отношений, в которых участвует узел вопроса:
+callReturn([
+	1_: fixed_: f_local_rel,
+	2_: fixed_: {[
+		1_: question_node,
+		2_: set1,
+		3_: result_set
+	]}
+]) //~ descr
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Поиск узлов примеров:
+searchSetStr5([
+	1_:  fixed_: question_node,
+	2_: assign_: arc_: pos_: const_: arc2,
+	3_: assign_: const_: node3,
+	4_: assign_: arc_: pos_: const_: arc4,
+	5_:  fixed_: example,
+	set3_: assign_: example_set
+], , example_end) // Атрибут node_ не указан, т.к. при его использовании
+		// некоторые нужные узлы не добавляются (причина не установлена).
+
+printNl([ 1_: fixed_: /"\nTest: search_full_semantic_neighbourhood: procedure: search_full_semantic_neighbourhood: point 3.1: example_set\n"/ ])
+//#printEl([ 1_: fixed_: example_set ])
+
+// Добавляем к результирующему множеству узел атрибута 'пример_'
+genElStr3([
+	1_:  fixed_: result_set,
+	2_: assign_: arc_: pos_: const_: arc2,
+	3_:  fixed_: example
+])
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Цикл по узлам примеров:
+label(example_beg)
+
+	// Получаем элемент из множества узлов примеров и удаляем его из этого
+	// множества:
+	searchElStr3([
+		1_:  fixed_: example_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_: assign_: const_: node3
+	], , example_end) // Атрибут node_ не указан, т.к. при его использовании
+		// некоторые нужные узлы не добавляются (причина не установлена).
+	eraseEl([ 1_: fixed_: arc2 ])
+
+	// Находим и добавляем к результирующему множеству узел примера; дугу между
+	// заданным объектом и узлом примера; дугу атрибута 'пример_':
+	searchElStr5([
+		1_:  fixed_: question_node,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: node3,
+		4_: assign_: arc_: pos_: const_: arc4,
+		5_:  fixed_: example
+	])
+	genElStr3([
+		1_:  fixed_: result_set,
+		2_: assign_: arc_: pos_: const_: arc,
+		3_:  fixed_: arc2
+	])
+	genElStr3([
+		1_:  fixed_: result_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: arc4
+	])
+	genElStr3([
+		1_:  fixed_: result_set, 
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: node3
+	], example_beg)
+label(example_end)
+
+return()
+end
+///////////////////////////////////////////////////////////////////Procedure End
+/////////////////////////////////////////////////////////////Procedure Beginning
+// Процедура, которая ищет и добавляет к результирующему множеству все элементы
+// бинарных отношений, в которых участвует узел заданного объекта.
+procedure(search_semantic_local_rel_chek,
+[[
+	bin_orient_norole_rel = "/info/stype_bin_orient_norole_rel";
+]],
+[{
+	result_set, target, connection_set, answer_reciever, e, arc, connection_target_arc,
+	arc1, arc2, arc3, arc4, node1, node2, node3, set1, rel_set, connection_node, rel_node, node
+}],
+{[
+	1_: in_: target,
+	2_: in_: connection_set,
+	3_: in_: out_: result_set
+]}
+)
+
+genElStr3([
+	1_:  fixed_: result_set,
+	2_: assign_: arc_: pos_: const_: arc2,
+	3_:  fixed_: target
+])
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Цикл по всем элементам множества предполагаемых связок:
+label(beg_local_rel)
+	
+	// Получаем элемент из множества предполагаемых связок и удаляем его из
+	// этого множества:
+	searchElStr3([
+		1_:  fixed_: connection_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_: assign_: node_: const_: connection_node
+	], , end_local_rel, end_local_rel)
+	eraseEl([ 1_: fixed_: arc2 ])
+
+	// Получаем множество всех надмножеств узла предполагаемой связки:
+	searchSetStr3([
+		1_: assign_: node_: const_: node1,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: connection_node,
+		set1_: assign_: rel_set
+	], ,beg_local_rel, beg_local_rel)
+
+	
+	////////////////////////////////////////////////////////////////////////////
+	// Поиск и добавление в результирующее множество узлов отношений и дуг от
+	// этих узлов отношений к узлу связки:
+	label(rel_beg)
+		// Получаем элемент надмножества и удаляем его дугу; если элементов нет,
+		// то связка не от отношения:
+		searchElStr3([
+			1_:  fixed_: rel_set,
+			2_: assign_: arc_: pos_: const_: arc2,
+			3_: assign_: node_: const_: rel_node
+		], , rel_end, rel_end)
+		eraseEl([ 1_: fixed_: arc2 ])
+
+		// Проверяем элемент на пренадлежность множеству отношений; если не
+		// принадлежит, то берем следующий элемент:
+		searchElStr3([
+			1_:  fixed_: bin_orient_norole_rel,
+			2_: assign_: arc_: pos_: const_: arc2,
+			3_:  fixed_: rel_node
+		], , rel_beg)
+
+		// Ищем дугу между узлом отношения и узлом связки:
+		searchElStr3([
+			1_:  fixed_: rel_node,
+			2_: assign_: arc_: pos_: const_: arc,
+			3_:  fixed_: connection_node
+		])
+
+		printNl([ 1_: fixed_: /"\nTest: search_full_semantic_neighbourhood: procedure: search_semantic_local_rel_chek: point 4.0: rel_node\n"/ ])
+		//#printEl([ 1_: fixed_: rel_node ])
+	
+		// Добавляем узел отношения и дугу между этим узлом и узлом связки в
+		// результирующее множество:
+		genElStr3([
+			1_:  fixed_: result_set,
+			2_: assign_: arc_: pos_: const_: arc2,
+			3_:  fixed_: rel_node
+		])
+		genElStr3([
+			1_:  fixed_: result_set,
+			2_: assign_: arc_: pos_: const_: arc2,
+			3_:  fixed_: arc
+		])
+		
+		nop(rel_beg) //~ ВНИМАНИЕ: УЗЕЛ REL_NODE МОЖЕТ ПЕРЕПИСАТЬСЯ В ЦИКЛЕ НЕИЗВЕСТНО ЧЕМ!!!                                                          //~ Пробуем, возможно, только все испортит(если у связки может быть только одно отношение, то это не нужно!!!! - Ничего не улучшило, но и не испортило.
+	label(rel_end)
+
+	
+	////////////////////////////////////////////////////////////////////////////
+	// Добавляем в результирующее множество узел связки:
+	genElStr3([
+		1_:  fixed_: result_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: connection_node
+	])
+
+	// Ищем и добавляем дугу между узлом связки отношения и заданным объектом:
+	searchElStr3([
+		1_:  fixed_: connection_node,
+		2_: assign_: arc_: pos_: const_: connection_target_arc,
+		3_:  fixed_: target
+	])
+	genElStr3([
+		1_:  fixed_: result_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: connection_target_arc
+	])
+
+	
+	////////////////////////////////////////////////////////////////////////////
+	// Проверяем наличие у этой дуги атрибута 1_, если его нет, то переходим к
+	// проверке атрибута 2_:
+	searchElStr3([
+		1_:  fixed_: 1_,
+		2_: assign_: arc_: pos_: const_: arc,
+		3_:  fixed_: connection_target_arc
+	], , no_attribute_1_, no_attribute_1_)
+
+	// Добавляем узел атрибута 1_ и дугу между этим узлом и дугой
+	// связка-заданный объект в результирующее множество:
+	genElStr3([
+		1_:  fixed_: result_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: 1_
+	])
+	genElStr3([
+		1_:  fixed_: result_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: arc
+	])
+
+	// Ищем элемент связки под атрибутом 2_; дугу между узлом связки и этим
+	// элементом; дугу атрибута:
+	searchElStr5([
+		1_:  fixed_: connection_node,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_: assign_: const_: node,
+		4_: assign_: arc_: pos_: const_: arc4,
+		5_:  fixed_: 2_
+	], , beg_local_rel) // Атрибут node_ не указан, т.к. при его использовании
+		// некоторые нужные узлы не добавляются (причина не установлена).
+		
+	printNl([ 1_: fixed_: /"\nTest: search_full_semantic_neighbourhood: procedure: search_semantic_local_rel_chek: point 4.1: node\n"/ ])
+	//#printEl([ 1_: fixed_: node ])
+
+	// Добавляем найденные элементы в результирующее множество:
+	genElStr3([
+		1_:  fixed_: result_set,
+		2_: assign_: arc_: pos_: const_: arc,
+		3_:  fixed_: arc2
+	])
+	genElStr3([
+		1_:  fixed_: result_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: arc4
+	])
+	genElStr3([
+		1_:  fixed_: result_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: node
+	], no_attribute_2_, no_attribute_2_, no_attribute_2_)
+
+	// Добавляем узел атрибута 2_ в результирующее множество:
+	genElStr3([                                                   
+		1_:  fixed_: result_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: 2_
+	])
+	
+	
+	////////////////////////////////////////////////////////////////////////////
+	// Проверяем у дуги связка-заданный объект наличие атрибута 2_:
+	label(no_attribute_1_)
+
+	searchElStr3([
+		1_:  fixed_: 2_,
+		2_: assign_: arc_: pos_: const_: arc,
+		3_:  fixed_: connection_target_arc
+	], , no_attribute_2_)
+
+	// Добавляем узел атрибута 2_ и его дугу к результирующему множеству:
+	genElStr3([
+		1_:  fixed_: result_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: 2_
+	])
+	genElStr3([
+		1_:  fixed_: result_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: arc
+	])
+
+	// Ищем элемент связки под атрибутом 1_; дугу между узлом связки и этим
+	// элементом; дугу атрибута:
+	searchElStr5([
+		1_:  fixed_: connection_node,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_: assign_: node_: const_: node,
+		4_: assign_: arc_: pos_: const_: arc4,
+		5_:  fixed_: 1_
+	], , beg_local_rel)
+
+	printNl([ 1_: fixed_: /"\nTest: search_full_semantic_neighbourhood: procedure: search_semantic_local_rel_chek: point 4.2: node\n"/ ])
+	//#printEl([ 1_: fixed_: node ])
+	
+	// Добавляем найденные элементы в результирующее множество:
+	genElStr3([
+		1_:  fixed_: result_set,
+		2_: assign_: arc_: pos_: const_: arc,
+		3_:  fixed_: arc2
+	])
+	genElStr3([
+		1_:  fixed_: result_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: arc4
+	])
+	genElStr3([
+		1_:  fixed_: result_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: node
+	])
+
+	// Добавляем узел атрибута 1_ в результирующее множество:
+	genElStr3([                                                    
+		1_:  fixed_: result_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: 1_
+	])
+	
+	label(no_attribute_2_)
+
+
+	// Найдем и добавим к результирующему множеству дуги, выходящие из узла,
+	// связанного связкой бинарного отношения с заданным объектом; узлы, в
+	// которые входят эти дуги:
+	searchSetStr3([
+		1_:  fixed_: node,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_: assign_: const_: node3, 
+		set2_: fixed_: result_set,
+		set3_: fixed_: result_set
+	]) // Атрибут node_ не указан, т.к. при его использовании некоторые нужные
+		// узлы не добавляются (причина не установлена).
+		
+	nop(beg_local_rel)
+label(end_local_rel)
+
+printNl([ 1_: fixed_: /"\nTest: search_full_semantic_neighbourhood: procedure: search_semantic_local_rel_chek: point 4.3: result_set\n"/ ])
+//#printEl([ 1_: fixed_: result_set ])
+
+return()
+end
+///////////////////////////////////////////////////////////////////Procedure End

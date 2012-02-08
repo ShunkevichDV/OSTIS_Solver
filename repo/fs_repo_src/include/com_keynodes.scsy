@@ -49,6 +49,7 @@ nrel_statement   		= 	"/etc/com_keynodes/утверждение*";
 rrel_superset   = "/etc/com_keynodes/надмножество_";
 rrel_subset    = "/etc/com_keynodes/подмножество_";
 nrel_prop_inclusion  =  "/etc/com_keynodes/строгое включение*";
+nrel_definition_range  =  "/etc/com_keynodes/область определения*";
 
 rrel_exp_base			=	"/etc/com_keynodes/основание_";
 rrel_exp_degree			=	"/etc/com_keynodes/степень_";
@@ -80,6 +81,7 @@ rrel_operation_is_over	=   "/etc/com_keynodes/операция выполнилась_";
 rrel_expression_is_substituted	=   "/etc/com_keynodes/выражение подставлено_";
 rrel_expression_isnt_substituted	=   "/etc/com_keynodes/выражение не подставлено_";
 rrel_program_is_absent	=   "/etc/com_keynodes/отсутствует программа_";
+rrel_axiom	=   "/etc/com_keynodes/аксиома_";
 
 group_transitive_relation = "/etc/com_keynodes/транзитивное отношение";
 group_all_equivalent_constructions = "/etc/com_keynodes/все семантически эквивалентные конструкции";
@@ -96,3 +98,4 @@ group_atomic_existence = "/etc/com_keynodes/атомарное сущестовование";
 task_solving_steps = "/etc/com_keynodes/этапы решения задачи";
 
 nrel_square = "/seb/planimetry/площадь*";
+nrel_perimeter = "/seb/planimetry/периметр*";

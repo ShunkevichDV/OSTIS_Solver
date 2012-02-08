@@ -1,0 +1,1043 @@
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+//------------------------------------------------------------------------------
+//         File: search_similarities.m4scp
+//  Description: File contains operation for similarity search of indicated
+//               nodes.
+//------------------------------------------------------------------------------
+//       Author: Ivan Kosik
+//         Date: 31.01.12
+
+#include "scp_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "com_keynodes.scsy"
+#include "_keynodes.scsy"
+#include "lib_search.scsy"
+#include "lib_set.scsy"
+#include "lib_answer.scsy"
+///////////////////////////////////////////////////////////////Program Beginning
+// Program that initialize operation:
+program(init_op,
+[[
+	q_initiated;
+	run_op;
+	catch_output_arc;
+]],
+[{
+}]
+)
+
+printNl([ 1_: fixed_: /"\nTest: search_similarities: program: init_op: point 1.1\n"/ ])
+
+// Subscribe to handle output arcs from "initiated question" node:
+sys_set_event_handler([
+	1_: fixed_: catch_output_arc,
+	2_: fixed_: run_op,
+	3_: fixed_: { 1_: q_initiated }
+])
+
+printNl([ 1_: fixed_: /"\nTest: search_similarities: program: init_op: point 1.2\n"/ ])
+
+return()
+end
+/////////////////////////////////////////////////////////////////////Program End
+/////////////////////////////////////////////////////////////Procedure Beginning
+// Procedure that process question and make answer:
+procedure(run_op,
+[[
+	q_search_similarities;
+	set_rm_el;
+	search_similarities;// = "/operation/search_similarities/search_similarities";
+	//# search_base_cycle; //~
+]],
+[{
+	// Input parameters:
+	descr, element, arc, question_node, //~ descr, element, arc ?
+	// Other variables:
+	segment, arc2, result, descr2, t_seg
+}],
+{[
+	1_: in_: descr,
+	2_: in_: element,
+	3_: in_: arc,
+	4_: in_: question_node
+]}
+)
+
+printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: run_op: point 2.1\n"/ ])
+
+//~
+printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: run_op: point 3300: RUNTIME ERROR\n"/ ])
+//#printEl([ 1_: fixed_: question_node ])
+// Need to set segment that contains question node as default to generate answer
+// in it:
+sys_get_location([ 1_: fixed_: question_node, 2_: assign_: segment ])
+//# sys_open_segment([ 1_: fixed_: segment ])
+sys_spin_segment([ 1_: fixed_: segment, 2_: assign_: t_seg ])
+sys_set_default_segment([ 1_: fixed_: segment ])
+
+searchElStr3([
+	1_:  fixed_: q_search_similarities,
+	2_: assign_: arc_: pos_: const_: arc2,
+	3_:  fixed_: question_node
+], , goto_end)
+
+//~ Call cycle to find axioms for all elements in a question:
+//# callReturn([
+	//# 1_: fixed_: search_base_cycle,
+	//# 2_: fixed_: {[
+		//# 1_: question_node,
+		//# 2_: search_similarities,
+		//# 3_: result
+	//# ]}
+//# ], , , , goto_error) //~ descr2
+
+//~ Перед этим нужно ещё выбрать из множества элементов вопроса только узлы (отбросить дуги)
+//~ Хотя может и с дугами нормально: оно просто ничего общего не найдет и всё!!! Так даже правильнее.
+// Создадим узел для результата:
+genEl([ 1_: assign_: node_: const_: result ])
+// Call procedure to find similarities of question nodes.
+callReturn([
+	1_: fixed_: search_similarities,
+	2_: fixed_: {[
+		1_: question_node,
+		2_: result
+	]}
+], , , , goto_error) //~ descr2
+
+// Remove question node from result:
+callReturn([
+	1_: fixed_: set_rm_el,
+	2_: fixed_: {[
+		1_: result,
+		2_: question_node
+	]}
+], , , , goto_error) //~ descr2
+
+// Make answer:
+callReturn([
+	1_: fixed_: answer_make,
+	2_: fixed_: {[
+		1_: question_node,
+		2_: result
+	]}
+], , , , goto_error) //~ descr2
+
+printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: run_op: point 2.2: result:\n"/ ])
+//#printEl([ 1_: fixed_: result ])
+return()
+
+label(goto_error)
+printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: run_op: point 2.3: RUNTIME ERROR\n"/ ])
+
+label(goto_end)
+return()
+end
+///////////////////////////////////////////////////////////////////Procedure End
+/////////////////////////////////////////////////////////////Procedure Beginning
+// Procedure that search for axioms:
+procedure(search_similarities,
+[[
+	search_common_nodes_of_bin_relations = "/operation/search_similarities/search_common_nodes_of_bin_relations"; //~
+]],
+[{
+	// Parameters:
+	question_node_set,
+	result_set,
+	// Other variables:
+	question_node,
+	rel_con_set, // Relation connection set.
+	node1, arc2, arc4
+}],
+{[
+	1_: in_: question_node_set,
+	2_: in_: out_: result_set
+]}
+)
+
+
+//~
+printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: run_op: point 3300: RUNTIME ERROR\n"/ ])
+//#printEl([ 1_: fixed_: question_node_set ])
+// Из множества узлов, у которых нужно найти сходства, выберем один узел:
+searchElStr3([
+	1_: fixed_: question_node_set,
+	2_: assign_: arc_: pos_: const_: arc2,
+	3_: assign_: node_: const_: question_node
+],)
+// Удалим его из этого множества:
+eraseEl([ 1_: fixed_: arc2 ])
+
+//~
+printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: search_similarities: point 3.0: question_node:\n"/ ])
+//#printEl([ 1_: fixed_: question_node ])
+//# eraseElStr3([
+	//# 1_:  fixed_: question_node_set,
+	//# 2_: assign_: arc_: pos_: const_: f_: arc2,
+	//# 3_: assign_: node_: const_: question_node
+//# ])
+
+// Получим все связки отношений у выбранного узла:
+searchSetStr5([
+	1_: assign_: node_: const_: node1,
+	2_: assign_: arc_: pos_: const_: arc2,
+	3_:  fixed_: question_node,
+	4_: assign_: arc_: pos_: const_: arc4,
+	5_:  fixed_: 1_,
+	set1_: assign_: rel_con_set
+])
+searchSetStr5([
+	1_: assign_: node_: const_: node1,
+	2_: assign_: arc_: pos_: const_: arc2,
+	3_:  fixed_: question_node,
+	4_: assign_: arc_: pos_: const_: arc4,
+	5_:  fixed_: 2_,
+	set1_: fixed_: rel_con_set
+])
+
+//~
+printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: run_op: point 3301: RUNTIME ERROR\n"/ ])
+//#printEl([ 1_: fixed_: question_node_set ])
+//~
+printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: search_similarities: point 3.1: question_node:\n"/ ])
+//#printEl([ 1_: fixed_: question_node ])
+// Вызовем процедуру поиска и добавления к результирующему множеству общих узлов
+// бинарных отношений:
+callReturn([
+	1_: fixed_: search_common_nodes_of_bin_relations,
+	2_: fixed_: {[
+		1_: question_node_set,
+		2_: question_node,
+		3_: rel_con_set,
+		4_: result_set
+	]}
+]) //~ descr
+
+return()
+end
+///////////////////////////////////////////////////////////////////Procedure End
+/////////////////////////////////////////////////////////////Procedure Beginning
+// Процедура, которая ищет и добавляет к результирующему множеству общие узлы
+// бинарных отношений.
+procedure(search_common_nodes_of_bin_relations,
+[[
+	search_sem = "/operation/search_full_semantic_neighbourhood/search_full_semantic_neighbourhood";
+	check_common_node_of_bin_relations = "/operation/search_similarities/check_common_node_of_bin_relations"; //~
+	bin_orient_norole_rel = "/info/stype_bin_orient_norole_rel";
+]],
+[{
+	// Parameters:
+	target_set,
+	target,
+	rel_con_set,
+	result_set,
+	// Other variables:
+	temp_set, // Временное множество элементов бинарных отношений, которые
+	// будут добавлены к результирующему множеству, если среди них есть общие
+	// узлы.
+	target_set_copy, target_node, sem_set, sem_node, rel_con_node, rel_set, rel_node, arc, con_target_arc, node, elements_of_bin_rel, set_of_real_relations, element,
+	node1, arc2, arc4,
+	answer_reciever, e, //~
+	arc1, arc3, node2, node3, set1 //~
+}],
+{[
+	1_: in_: target_set,
+	2_: in_: target,
+	3_: in_: rel_con_set,
+	4_: in_: out_: result_set
+]}
+)
+
+//~
+//# genElStr3([
+	//# 1_: assign_: temp_set,
+	//# 2_: assign_: arc_: pos_: const_: arc2,
+	//# 3_:  fixed_: target
+//# ])
+//~
+printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: search_common_nodes_of_bin_relations: point 4.02: target:\n"/ ])
+//#printEl([ 1_: fixed_: target ])
+
+////////////////////////////////////////////////////////////////////////////////
+// Сформируем множество семантических окрестностей целевых узлов.
+// Создадим узел множества семантических окрестностей:
+genEl([ 1_: assign_: node_: const_: sem_set ])
+
+//~
+printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: search_common_nodes_of_bin_relations: point 4.03: target_set:\n"/ ])
+//#printEl([ 1_: fixed_: target_set ])
+// Создадим копию множества целевых узлов, т.к. оригинал нужно будет передать в
+// процедуру check_common_node_of_bin_relations:
+searchSetStr3([
+	1_:  fixed_: target_set,
+	2_: assign_: arc_: pos_: const_: arc2,
+	3_: assign_: node_: const_: target_node,
+	set3_: assign_: target_set_copy
+])
+
+// Цикл по копии множества целевых узлов:
+label(target_set_copy_beg)
+	// Получим целевой узел из множества и удалим его из этого множества. Если
+	// во множестве нет узлов, то выйдем из цикла:
+	searchElStr3([
+		1_:  fixed_: target_set_copy,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_: assign_: node_: const_: target_node
+	], , target_set_copy_end, target_set_copy_end)
+	eraseEl([ 1_: fixed_: arc2 ])
+	
+	// Создадим узел для семантической окрестности:
+	genEl([ 1_: assign_: node_: const_: sem_node ])
+	
+	// Вызовем процедуру поиска семантической окрестности для целевого узла:
+	callReturn([
+		1_: fixed_: search_sem,
+		2_: fixed_: {[
+			1_: target_node,
+			2_: sem_node
+		]}
+	]) //~ descr
+	//~
+	printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: search_common_nodes_of_bin_relations: point 4.04: target:\n"/ ])
+	//#printEl([ 1_: fixed_: target ])
+
+	// Добавим найденную семантическую окрестность во множество семантических
+	// окрестностей:
+	genElStr3([
+		1_:  fixed_: sem_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: sem_node
+	])
+	
+	nop(target_set_copy_beg)
+label(target_set_copy_end)
+
+
+//~
+printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: search_common_nodes_of_bin_relations: point 4.05: target:\n"/ ])
+//#printEl([ 1_: fixed_: target ])		
+////////////////////////////////////////////////////////////////////////////////
+// Цикл по всем элементам множества предполагаемых связок отношений:
+label(possible_rel_con_set_beg)
+printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: search_common_nodes_of_bin_relations: point 4.055: target:\n"/ ])
+//#printEl([ 1_: fixed_: target ])
+	//~
+	//#printEl([ 1_: fixed_: target ])
+	printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: search_common_nodes_of_bin_relations: point 4.06: target:\n"/ ])
+	//#printEl([ 1_: fixed_: target ])
+	// Очистим временное множество. Добавим в него целевой узел:
+	genElStr3([
+		1_: assign_: temp_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: target
+	])
+
+	// Получим связку из множества предполагаемых связок отношений и удалим её
+	// из этого множества:
+	searchElStr3([
+		1_:  fixed_: rel_con_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_: assign_: node_: const_: rel_con_node
+	], , possible_rel_con_set_end, possible_rel_con_set_end)
+	eraseEl([ 1_: fixed_: arc2 ])
+
+	// Получим множество всех возможных узлов отношений для данной связки.
+	// Если элементов не найдено, то связка не от отношения; перейдём к
+	// следующей связке:
+	searchSetStr3([
+		1_: assign_: node_: const_: node1,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: rel_con_node,
+		set1_: assign_: rel_set
+	], ,possible_rel_con_set_beg, possible_rel_con_set_beg)
+
+
+	////////////////////////////////////////////////////////////////////////////
+	// Цикл для поиска и добавления во временное множество всех узлов
+	// отношений и дуг от этих узлов отношений к узлу связки. Одновременно
+	// сформируем множество настоящих отношений, а не возможных.
+	// Создадим узел множества настоящих отношений:
+	genEl([ 1_: assign_: node_: const_: set_of_real_relations ])
+	label(possible_rel_set_beg)
+		// Получим узел возможного отношения и удалим его из соответствующего
+		// множества.
+		searchElStr3([
+			1_:  fixed_: rel_set,
+			2_: assign_: arc_: pos_: const_: arc2,
+			3_: assign_: node_: const_: rel_node
+		], , possible_rel_set_end, possible_rel_set_end)
+		eraseEl([ 1_: fixed_: arc2 ])
+
+		// Проверяем узел на принадлежность множеству отношений; если не
+		// принадлежит, то переходим к следующему:
+		searchElStr3([
+			1_:  fixed_: bin_orient_norole_rel,
+			2_: assign_: arc_: pos_: const_: arc2,
+			3_:  fixed_: rel_node
+		], , possible_rel_set_beg)
+		
+		// Добавим отношение во множество настоящих отношений:
+		genElStr3([
+			1_:  fixed_: set_of_real_relations,
+			2_: assign_: arc_: pos_: const_: arc2,
+			3_:  fixed_: rel_node
+		])
+
+		// Ищем дугу между узлом отношения и узлом связки:
+		searchElStr3([
+			1_:  fixed_: rel_node,
+			2_: assign_: arc_: pos_: const_: arc,
+			3_:  fixed_: rel_con_node
+		])
+
+		printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: search_common_nodes_of_bin_relations: point 4.0: rel_node:\n"/ ])
+		//#printEl([ 1_: fixed_: rel_node ])
+	
+		// Добавляем узел отношения и дугу между этим узлом и узлом связки во
+		// временное множество:
+		genElStr3([
+			1_:  fixed_: temp_set,
+			2_: assign_: arc_: pos_: const_: arc2,
+			3_:  fixed_: rel_node
+		])
+		genElStr3([
+			1_:  fixed_: temp_set,
+			2_: assign_: arc_: pos_: const_: arc2,
+			3_:  fixed_: arc
+		])
+		
+		nop(possible_rel_set_beg) //~ Если у связки может быть только одно отношение, то это не нужно (тогда увеличится скорость работы).
+	label(possible_rel_set_end)
+
+	
+	////////////////////////////////////////////////////////////////////////////
+	// Добавляем во временное множество узел связки отношения:
+	genElStr3([
+		1_:  fixed_: temp_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: rel_con_node
+	])
+
+	// Ищем и добавляем дугу между узлом связки отношения и заданным объектом:
+	searchElStr3([
+		1_:  fixed_: rel_con_node,
+		2_: assign_: arc_: pos_: const_: con_target_arc,
+		3_:  fixed_: target
+	])
+	genElStr3([
+		1_:  fixed_: temp_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: con_target_arc
+	])
+
+	
+	////////////////////////////////////////////////////////////////////////////
+	// Проверяем наличие у этой дуги атрибута 1_, если его нет, то переходим к
+	// проверке атрибута 2_:
+	searchElStr3([
+		1_:  fixed_: 1_,
+		2_: assign_: arc_: pos_: const_: arc,
+		3_:  fixed_: con_target_arc
+	], , no_attribute_1_, no_attribute_1_)
+
+	// Добавляем узел атрибута 1_ и дугу между этим узлом и дугой
+	// связка-заданный объект во временное множество:
+	genElStr3([
+		1_:  fixed_: temp_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: 1_
+	])
+	genElStr3([
+		1_:  fixed_: temp_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: arc
+	])
+
+	// Ищем элемент связки отношения под атрибутом 2_; дугу между узлом связки
+	// и этим элементом; дугу атрибута:
+	searchElStr5([
+		1_:  fixed_: rel_con_node,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_: assign_: const_: node,
+		4_: assign_: arc_: pos_: const_: arc4,
+		5_:  fixed_: 2_
+	], , possible_rel_con_set_beg) // Атрибут node_ не указан, т.к. при его использовании
+		// некоторые нужные узлы не добавляются (причина не установлена).
+		
+	printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: search_common_nodes_of_bin_relations: point 4.1: node:\n"/ ])
+	//#printEl([ 1_: fixed_: node ])
+
+	// Добавляем найденные элементы во временное множество:
+	genElStr3([
+		1_:  fixed_: temp_set,
+		2_: assign_: arc_: pos_: const_: arc,
+		3_:  fixed_: arc2
+	])
+	genElStr3([
+		1_:  fixed_: temp_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: arc4
+	])
+	genElStr3([
+		1_:  fixed_: temp_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: node
+	])
+
+	// Добавляем узел атрибута 2_ во временное множество:
+	genElStr3([                                                   
+		1_:  fixed_: temp_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: 2_
+	], no_attribute_2_, no_attribute_2_, no_attribute_2_)
+	
+	
+	////////////////////////////////////////////////////////////////////////////
+	// Проверим у дуги связка-заданный объект наличие атрибута 2_:
+	label(no_attribute_1_)
+
+	searchElStr3([
+		1_:  fixed_: 2_,
+		2_: assign_: arc_: pos_: const_: arc,
+		3_:  fixed_: con_target_arc
+	], , no_attribute_2_)
+
+	// Добавим узел атрибута 2_ и его дугу во временное множество:
+	genElStr3([
+		1_:  fixed_: temp_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: 2_
+	])
+	genElStr3([
+		1_:  fixed_: temp_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: arc
+	])
+
+	// Найдём элемент связки под атрибутом 1_; дугу между узлом связки и этим
+	// элементом; дугу атрибута:
+	searchElStr5([
+		1_:  fixed_: rel_con_node,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_: assign_: node_: const_: node,
+		4_: assign_: arc_: pos_: const_: arc4,
+		5_:  fixed_: 1_
+	], , possible_rel_con_set_beg)
+
+	printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: search_common_nodes_of_bin_relations: point 4.2: node:\n"/ ])
+	//#printEl([ 1_: fixed_: node ])
+	
+	// Добавляем найденные элементы во временное множество:
+	genElStr3([
+		1_:  fixed_: temp_set,
+		2_: assign_: arc_: pos_: const_: arc,
+		3_:  fixed_: arc2
+	])
+	genElStr3([
+		1_:  fixed_: temp_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: arc4
+	])
+	genElStr3([
+		1_:  fixed_: temp_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: node
+	])
+
+	// Добавляем узел атрибута 1_ во временное множество:
+	genElStr3([                                                    
+		1_:  fixed_: temp_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_:  fixed_: 1_
+	])
+	
+	label(no_attribute_2_)
+
+
+	////////////////////////////////////////////////////////////////////////////
+	// Вызовем процедуру, которая проверяет, задано ли на всех семантических
+	// окрестностях из множества хотя бы одно отношение из множества отношений
+	// set_of_real_relations. Если задано, то проверяет, есть ли у всех целевой
+	// узел target_node. И если есть, то возвращает множество, содержащее
+	// элементы бинарного отношения.
+	// Создадим узел для хранения результата процедуры:
+	//~
+	printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: search_common_nodes_of_bin_relations: point 4.3:\n"/ ])
+	genEl([ 1_: assign_: node_: const_: elements_of_bin_rel ])
+	callReturn([
+		1_: fixed_: check_common_node_of_bin_relations,
+		2_: fixed_: {[
+			1_: sem_set,
+			2_: set_of_real_relations,
+			3_: node,
+			4_: target_set,
+			5_: elements_of_bin_rel
+		]}
+	]) //~ descr
+						
+	// Проверим, пустое ли множество результата процедуры. Если множество
+	// пустое, то общих отношений с общим узлом нет. Перейдём к проверке
+	// следующей связки отношения:
+	searchElStr3([
+		1_:  fixed_: elements_of_bin_rel,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_: assign_: node_: const_: node3
+	], , possible_rel_con_set_beg, possible_rel_con_set_beg)
+
+	// Множество не пустое. Добавим элементы временного множества и элементы
+	// множества elements_of_bin_rel к результирующему множеству:
+	searchSetStr3([
+		1_:  fixed_: temp_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_: assign_: const_: element,
+		set3_: fixed_: result_set
+	])
+	searchSetStr3([
+		1_:  fixed_: elements_of_bin_rel,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_: assign_: const_: element,
+		set3_: fixed_: result_set
+	])
+	
+	nop(possible_rel_con_set_beg)
+label(possible_rel_con_set_end)
+
+printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: search_common_nodes_of_bin_relations: point 4.6: result_set:\n"/ ])
+//#printEl([ 1_: fixed_: result_set ])
+
+return()
+end
+///////////////////////////////////////////////////////////////////Procedure End
+/////////////////////////////////////////////////////////////Procedure Beginning
+// Процедура проверяет, задано ли на всех семантических окрестностях из
+// множества хотя бы одно отношение из множества отношений rel_set. Если задано,
+// то проверяет, есть ли у всех целевой узел target_node. И если есть, то
+// возвращает множество, содержащее элементы бинарного отношения.
+procedure(check_common_node_of_bin_relations,
+[[
+	bin_orient_norole_rel = "/info/stype_bin_orient_norole_rel";
+]],
+[{
+	// Parameters:
+	sem_set,
+	rel_set,
+	target_node,
+	sem_center_set,
+	result_set,
+	// Other variables:
+	rel_node, sem_node, sem_set_copy, rel_con_set, rel_con_node, temp_set, node, arc, common_nodes, common_node,
+	element, node3, arc2, arc4,
+	rel_set, con_target_arc, //~
+	node1, //~
+	answer_reciever, e, //~
+	arc1, arc3, node2, set1 //~
+}],
+{[
+	1_: in_: sem_set, // Множество семантических окрестностей.
+	2_: in_: rel_set, // Множество отношений.
+	3_: in_: target_node,
+	4_: in_: sem_center_set, // Множество узлов, для которых искали
+	// семантические окрестности.
+	5_: in_: out_: result_set
+]}
+)
+
+
+//# genElStr3([
+	//# 1_: assign_: temp_set,
+	//# 2_: assign_: arc_: pos_: const_: arc2,
+	//# 3_:  fixed_: target
+//# ])
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Цикл по множеству отношений:
+label(rel_set_beg)
+	//~
+	printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: check_common_node_of_bin_relations: point 5.1: rel_set:\n"/ ])
+	//#printEl([ 1_: fixed_: rel_set ])
+	// Получим отношение из множества и удалим его из этого множества. Если
+	// во множесве нет отношений, то выйдем из цикла:
+	searchElStr3([
+		1_:  fixed_: rel_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_: assign_: node_: const_: rel_node
+	], , rel_set_end, rel_set_end)
+	eraseEl([ 1_: fixed_: arc2 ])
+
+	
+	// Создадим копию множества семантических окрестностей:
+	searchSetStr3([
+		1_:  fixed_: sem_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_: assign_: node_: const_: node3,
+		set3_: assign_: sem_set_copy,
+	])
+	////////////////////////////////////////////////////////////////////////////
+	// Цикл по копии множества семантических окрестностей. Проверим, есть ли во
+	// всех семантических окрестностях текущее отношение.
+	label(sem_set_copy_beg_1)
+		// Получим семантическую окрестность из множества и удалим её из этого
+		// множества. Если во множестве нет элементов, то выйдем из цикла:
+		searchElStr3([
+			1_:  fixed_: sem_set_copy,
+			2_: assign_: arc_: pos_: const_: arc2,
+			3_: assign_: node_: const_: sem_node
+		], , sem_set_copy_end_1, sem_set_copy_end_1)
+		eraseEl([ 1_: fixed_: arc2 ])
+
+		// Проверим, есть ли в текущей семантической окрестности текущее
+		// отношение. Если хотя бы в одной нету, то остальные уже проверять не
+		// нужно, поэтому проверяем следующее отношение:
+		searchElStr3([
+			1_:  fixed_: sem_node,
+			2_: assign_: arc_: pos_: const_: arc2,
+			3_:  fixed_: node_: const_: rel_node
+		], , rel_set_beg, rel_set_beg)
+		
+		nop(sem_set_copy_beg_1)
+	label(sem_set_copy_end_1)
+
+	
+	//~
+	printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: check_common_node_of_bin_relations: point 5.2:\n"/ ])
+	// Создадим копию множества семантических окрестностей:
+	searchSetStr3([
+		1_:  fixed_: sem_set,
+		2_: assign_: arc_: pos_: const_: arc2,
+		3_: assign_: node_: const_: node3,
+		set3_: assign_: sem_set_copy,
+	])
+	////////////////////////////////////////////////////////////////////////////
+	// Такое отношение есть во всех семантических окрестностях. Теперь нужно
+	// проверить, общий ли у них целевой узел.
+	// Еще один цикл по копии множества семантических окрестностей:
+	label(sem_set_copy_beg_2)
+		//~
+		printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: check_common_node_of_bin_relations: point 5.25: sem_set_copy:\n"/ ])
+		//#printEl([ 1_: fixed_: sem_set_copy ])
+		// Получим семантическую окрестность из множества и удалим её из этого
+		// множества. Если во множестве нет элементов, то выйдем из цикла:
+		searchElStr3([
+			1_:  fixed_: sem_set_copy,
+			2_: assign_: arc_: pos_: const_: arc2,
+			3_: assign_: node_: const_: sem_node
+		], , sem_set_copy_end_2, sem_set_copy_end_2)
+		eraseEl([ 1_: fixed_: arc2 ])
+		//~
+		printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: check_common_node_of_bin_relations: point 5.3: sem_node:\n"/ ])
+		//#printEl([ 1_: fixed_: sem_node ])
+		printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: check_common_node_of_bin_relations: point 5.32: rel_node:\n"/ ])
+		//#printEl([ 1_: fixed_: rel_node ])
+		
+		// Найдём множество связок текущего отношения в текущей семантической
+		// окрестности:
+		searchSetStr5([
+			1_:  fixed_: rel_node,
+			2_: assign_: arc_: pos_: const_: arc2,
+			3_: assign_: node_: const_: node3,
+			4_: assign_: arc_: pos_: const_: arc4,
+			5_:  fixed_: sem_node,
+			set3_: assign_: rel_con_set
+		])
+		//~
+		printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: check_common_node_of_bin_relations: point 5.35: rel_con_set:\n"/ ])
+		//#printEl([ 1_: fixed_: rel_con_set ])
+	
+		////////////////////////////////////////////////////////////////////////
+		// Найдём у этих связок узлы под атрибутами 1_ и 2_. Определим, какой из
+		// них является центром семантической окрестности. Тогда под другим
+		// атрибутом будет тот узел, который нужно сравнить с целевым узлом.
+		// Цикл по множеству связок отношений:
+		label(rel_con_set_beg)
+			// Создадим временное множество, которое содержит узел текущего
+			// отношения. При каждой итерации цикла оно будет очищаться:
+			genElStr3([
+				1_: assign_: temp_set,
+				2_: assign_: arc_: pos_: const_: arc2,
+				3_:  fixed_: rel_node
+			])
+			
+			// Получим связку отношения из множества и удалим её из этого
+			// множества. Если во множестве нет элементов, то выйдем из цикла:
+			searchElStr3([
+				1_:  fixed_: rel_con_set,
+				2_: assign_: arc_: pos_: const_: arc2,
+				3_: assign_: node_: const_: rel_con_node
+			], , rel_con_set_end, rel_con_set_end)
+			eraseEl([ 1_: fixed_: arc2 ])
+	
+			// Добавим во временное множество узел связки отношения и дугу к
+			// ней:
+			genElStr3([
+				1_:  fixed_: temp_set,
+				2_: assign_: arc_: pos_: const_: arc2,
+				3_:  fixed_: rel_con_node
+			])
+			searchElStr3([
+				1_:  fixed_: rel_node,
+				2_: assign_: arc_: pos_: const_: arc,
+				3_:  fixed_: rel_con_node
+			])
+			genElStr3([
+				1_:  fixed_: temp_set,
+				2_: assign_: arc_: pos_: const_: arc2,
+				3_:  fixed_: arc
+			])
+			
+			//~ Убран атрибут node_:
+			// Найдём узел связки отношения под атрибутом 1_. Если не найдём, то
+			// перейдём к проверке следующей связки отношения:
+			searchElStr5([
+				1_:  fixed_: rel_con_node,
+				2_: assign_: arc_: pos_: const_: arc2,
+				3_: assign_: const_: node,
+				4_: assign_: arc_: pos_: const_: arc4,
+				5_:  fixed_: 1_
+			], , rel_con_set_beg, rel_con_set_beg)
+			//~ ВНИМАНИЕ!!! Выше, возможно, не нужно указывать атрибут node_ в 3-ьем аргументе!!!
+			//~ ВНИМАНИЕ!!! Я ищу узлы под атрибутами 1_ и 2_, но если унарное отношение будет в текущий момент проверяться, то возможны ошибки. В этом случае можно сделать переход к началу цикла проверки следующего отношения, если не найден узел под каким-либо атрибутом!	
+			
+			// Добавим найденные элементы к временному множеству:
+			genElStr3([
+				1_:  fixed_: temp_set,
+				2_: assign_: arc_: pos_: const_: arc,
+				3_:  fixed_: node
+			])
+			genElStr3([
+				1_:  fixed_: temp_set,
+				2_: assign_: arc_: pos_: const_: arc,
+				3_:  fixed_: 1_
+			])
+			genElStr3([
+				1_:  fixed_: temp_set,
+				2_: assign_: arc_: pos_: const_: arc,
+				3_:  fixed_: arc2
+			])
+			genElStr3([
+				1_:  fixed_: temp_set,
+				2_: assign_: arc_: pos_: const_: arc2,
+				3_:  fixed_: arc4
+			])
+			
+			//~ Убран атрибут node_:
+			// Найдём узел связки отношения под атрибутом 2. Если не найдём, то
+			// перейдём к проверке следующей связки отношения:
+			searchElStr5([
+				1_:  fixed_: rel_con_node,
+				2_: assign_: arc_: pos_: const_: arc2,
+				3_: assign_: const_: node3,
+				4_: assign_: arc_: pos_: const_: arc4,
+				5_:  fixed_: 2_
+			], , rel_con_set_beg, rel_con_set_beg)
+			
+			//~
+			printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: check_common_node_of_bin_relations: point 5.4: node3:\n"/ ])
+			//#printEl([ 1_: fixed_: node3 ])
+			// Добавим найденные элементы к временному множеству:
+			genElStr3([
+				1_:  fixed_: temp_set,
+				2_: assign_: arc_: pos_: const_: arc,
+				3_:  fixed_: node3
+			])
+			genElStr3([
+				1_:  fixed_: temp_set,
+				2_: assign_: arc_: pos_: const_: arc,
+				3_:  fixed_: 1_
+			])
+			genElStr3([
+				1_:  fixed_: temp_set,
+				2_: assign_: arc_: pos_: const_: arc,
+				3_:  fixed_: arc2
+			])
+			genElStr3([
+				1_:  fixed_: temp_set,
+				2_: assign_: arc_: pos_: const_: arc2,
+				3_:  fixed_: arc4
+			])
+			
+			// Проверим, является ли узел под атрибутом 1_ центром семантической
+			// окрестности (узлом, для которого искали семантическую
+			// окрестность). Если является, то для сравнения нужно взять узел
+			// под атрибутом 2_, иначе берем узел под атрибутом 1_:
+			searchElStr3([
+				1_:  fixed_: sem_center_set,
+				2_: assign_: arc_: pos_: const_: arc2,
+				3_:  fixed_: node
+			], , not_center, not_center)
+			
+			//~ Убран атрибут node_:
+			// Узел под атрибутом 1_ является центром семантической окрестности.
+			// Для сравнения с целевым узлом найдём узел под атрибутом 2_ и
+			// присвоим переменной node:
+			searchElStr5([
+				1_:  fixed_: rel_con_node,
+				2_: assign_: arc_: pos_: const_: arc2,
+				3_: assign_: const_: node,
+				4_: assign_: arc_: pos_: const_: arc4,
+				5_:  fixed_: 2_
+			])
+			
+			
+			////////////////////////////////////////////////////////////////////
+			// Теперь переменной node присвоен именно тот узел, который нужно
+			// сравнить с целевым узлом.
+			label(not_center)
+			//~
+			printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: check_common_node_of_bin_relations: point 5.5: node:\n"/ ])
+			//#printEl([ 1_: fixed_: node ])
+
+			// Сравниваем узел с целевым узлом. Если узлы равны (совпадают), то
+			// добавляем к результирующему множеству элементы временного
+			// множества.
+			ifCoin([
+				1_: node,
+				2_: target_node
+			], make_result, not_equal, not_equal)
+		
+			
+			////////////////////////////////////////////////////////////////////
+			// Узлы не равны. Найдём объединение множеств узлов, которые
+			// связаны дугой принадлежности с ними. И посмотрим, есть ли в
+			// результирующем множестве узлы.
+			label(not_equal)
+			
+			//~ Возможно, не верно или не нужно. Тогда ниже нужно assign_:
+			//# genEl([ 1_: assign_: common_nodes ])
+			//~ Убран атрибут node_:
+			// Создадим множество common_nodes. Сначала присвоим ему узлы
+			// множества node:
+			searchSetStr3([
+				1_:  fixed_: node,
+				2_: assign_: arc_: pos_: const_: arc2,
+				3_: assign_: const_: node3,
+				set3_: assign_: common_nodes
+			])
+
+			//~
+			printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: check_common_node_of_bin_relations: point 5.55: node:\n"/ ])
+			//#printEl([ 1_: fixed_: node ])
+			printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: check_common_node_of_bin_relations: point 5.6: common_nodes:\n"/ ])
+			//#printEl([ 1_: fixed_: common_nodes ])
+			printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: check_common_node_of_bin_relations: point 5.65: target_node:\n"/ ])
+			//#printEl([ 1_: fixed_: target_node ])
+			//~ Ниже common_nodes, вроде, нужно assign_:, но тогда не работает.
+			//~ Убран атрибут node_:
+			// Получим множество common_nodes, состоящее из общих узлов:
+			selectYStr3([
+				1_:  fixed_: target_node,
+				2_: assign_: arc_: pos_: const_: arc2,
+				3_: assign_: const_: node3,
+				set3_: fixed_: common_nodes
+			])
+
+			//~
+			printNl([ 1_: fixed_: /"\nTest: search_similarities: procedure: check_common_node_of_bin_relations: point 5.7: common_nodes:\n"/ ])
+			//#printEl([ 1_: fixed_: common_nodes ])
+			//~ Убран атрибут node_:
+			// Проверим, пустое оно или нет. Если множество пустое, то общих
+			// узлов нет. Переходим к проверке следующей связки текущего
+			// отношения:
+			searchElStr3([
+				1_:  fixed_: common_nodes,
+				2_: assign_: arc_: pos_: const_: arc2,
+				3_: assign_: const_: node3
+			], , rel_con_set_beg, rel_con_set_beg)
+
+			
+			////////////////////////////////////////////////////////////////////
+			// Множество не пустое. Общие узлы есть. Добавим во временное
+			// множество общие узлы и дуги к ним.
+			// Цикл по множеству общих узлов:
+			label(common_nodes_beg)
+				//~ Убран атрибут node_:
+				// Получим узел из множества и удалим его из этого множества.
+				// Если во множестве нет узлов, то выйдем из цикла:
+				searchElStr3([
+					1_:  fixed_: common_nodes,
+					2_: assign_: arc_: pos_: const_: arc2,
+					3_: assign_: const_: common_node
+				], , common_nodes_end, common_nodes_end)
+				eraseEl([ 1_: fixed_: arc2 ])
+			
+				// Добавим во временное множество общий узел и дугу к нему из
+				// узла node:
+				genElStr3([
+					1_:  fixed_: temp_set,
+					2_: assign_: arc_: pos_: const_: arc2,
+					3_:  fixed_: common_node
+				])
+				searchElStr3([
+					1_:  fixed_: node,
+					2_: assign_: arc_: pos_: const_: arc,
+					3_:  fixed_: common_node
+				])
+				genElStr3([
+					1_:  fixed_: temp_set,
+					2_: assign_: arc_: pos_: const_: arc2,
+					3_:  fixed_: arc
+				])
+				
+				// Добавим во временное множество дугу к общему узлу из целевого
+				// узла:
+				searchElStr3([
+					1_:  fixed_: target_node,
+					2_: assign_: arc_: pos_: const_: arc,
+					3_:  fixed_: common_node
+				])
+				genElStr3([
+					1_:  fixed_: temp_set,
+					2_: assign_: arc_: pos_: const_: arc2,
+					3_:  fixed_: arc
+				])
+			
+				nop(common_nodes_beg)
+			label(common_nodes_end)
+			
+			
+			////////////////////////////////////////////////////////////////////
+			// Добавим элементы временного множества к результирующему:
+			label(make_result)
+			
+			searchSetStr3([
+				1_:  fixed_: temp_set,
+				2_: assign_: arc_: pos_: const_: arc2,
+				3_: assign_: const_: element,
+				set3_: fixed_: result_set
+			])
+			
+		 
+			nop(rel_con_set_beg)
+		label(rel_con_set_end)
+	
+	
+		nop(sem_set_copy_beg_2)
+	label(sem_set_copy_end_2)
+	
+	
+	nop(rel_set_beg)
+label(rel_set_end)
+
+return()
+end
+///////////////////////////////////////////////////////////////////Procedure End

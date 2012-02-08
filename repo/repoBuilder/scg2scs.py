@@ -222,7 +222,7 @@ class Node(Element):
 
             if self._content_type == "2" or self._content_type == "3":
                 self._content = self._content.replace("\n", "")
-                res = res + ('%s %s %s;\n' % (self.get_glob_id_str(), fmt_a, self._content))
+                res = res + ('%s %s "%s";\n' % (self.get_glob_id_str(), fmt_a, self._content))
             else:
                 # writing content
                 res = res + ('%s %s %s/"%s"/;\n' % (self.get_glob_id_str(), fmt_a, _b64, self._content))

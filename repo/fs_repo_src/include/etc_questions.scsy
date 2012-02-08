@@ -88,3 +88,8 @@ nrel_action_area = "/etc/questions/область действия вопроса*";
 nrel_key_fragment = "/etc/questions/ключевой фрагмент вопроса*";
 nrel_answer = "/etc/questions/ответ*";
 nrel_general_formulation = "/etc/questions/обобщенная формулировка вопроса*";
+
+q_search_definition_range = "/etc/questions/поиск области определения";
+q_search_similarities = "/etc/questions/поиск сходств";
+q_search_axioms = "/etc/questions/поиск аксиом";
+q_search_full_semantic_neighbourhood = "/etc/questions/поиск полной семантической окрестности";

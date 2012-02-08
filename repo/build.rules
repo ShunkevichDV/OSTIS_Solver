@@ -17,8 +17,8 @@
 # example 
 
 # core KB
-#scn:> "/seb/planimetry" "/etc/com_keynodes" "seb/planimetry"
-scg:> "seb/planimetry" -> "seb/planimetry"
+#scn:> "/seb/planimetry" "/etc/com_keynodes" "seb/planimetry_src"
+scg:> "seb/planimetry_src" -> "seb/planimetry"
 
 scg:> "etc/com_keynodes_src" -> "etc/com_keynodes"
 scg:> "ui/menu" -> "ui/menu"

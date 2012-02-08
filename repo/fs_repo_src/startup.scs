@@ -68,11 +68,11 @@ along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
 	"/operation/check_impl_statement_validity_prov/init_op",
 	"/operation/preprocessing/preprocessing"
 	//#"/operation/find_sc_program/init_op"
-	//#"/operation/discovery/discovery"
-	/*"/operation/geometry_menu_operations/get_square/init_op",
-	"/operation/geometry_menu_operations/get_perimeter/init_op",
 	
-	"/operation/search_antipode/init_op",
+	/*"/operation/geometry_menu_operations/get_square/init_op",
+	"/operation/geometry_menu_operations/get_perimeter/init_op",*/
+	
+	/*"/operation/search_antipode/init_op",
 	"/operation/search_bibliography/init_op",
 	"/operation/search_definition/init_op",
 	"/operation/search_explanation/init_op",
@@ -86,5 +86,9 @@ along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
 	"/operation/search_rel_schema/init_op",
 	"/operation/search_statement/init_op",
 	"/operation/search_of_all_supersets/init_op",
-	"/operation/search_binary_relations_connecting_two_concept/init_op"*/
+	"/operation/search_binary_relations_connecting_two_concept/init_op",
+	"/operation/search_similarities/init_op",
+	"/operation/search_axioms/init_op",
+	"/operation/search_definition_range/init_op",
+	"/operation/search_full_semantic_neighbourhood/init_op"*/
 };

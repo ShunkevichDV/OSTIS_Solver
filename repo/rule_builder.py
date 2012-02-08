@@ -1,20 +1,41 @@
-'''
-Created on 26.01.2011
+"""
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
 
-@author: Dmitry Kolb
+Copyright (c) 2011 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+"""
+
+'''
+Created on 13.10.10
+
+@author: DenisKoronchik
+@modified: Dmitry Kolb
 '''
 import os, sys, traceback
 from pyparsing import *
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(script_dir, "repoBuilder"))
+script_dir = os.path.abspath(os.curdir)#os.path.dirname(os.path.abspath(__file__))
+#sys.path.append(os.path.join(script_dir, "repoBuilder"))
 
-from builder import Builder
 import shutil
 import re
-import scg_build
-import defines
-import SCnML2SC.SCnML2SC as SCnML2SC
+import repoBuilder.scg_build as scg_build
+import repoBuilder.defines as defines
 import xml.dom.minidom as xml
 
 type = oneOf("scg inc scn scs new gwfkey")
@@ -22,7 +43,7 @@ par = oneOf("beg end")
 direction = oneOf("-> <-")
 arg = QuotedString('"',endQuoteChar='"')
 comment = pythonStyleComment
-rule = Group(type + Suppress(Literal(":>")) + Optional(par) + arg + Optional(direction) + Optional(arg) + Optional(arg))
+rule = Group(type + Suppress(Literal(":>")) + Optional(par) + arg + Optional(direction) + Optional(arg) + Optional(arg) + Optional(arg) + Optional(arg))
 rules  = OneOrMore(rule^Suppress(comment))
 
 self = sys.modules[globals()['__name__']]
@@ -123,15 +144,18 @@ def apply_rule_inc(rule):
         traceback.print_exc(file=sys.stdout)
 		
 def apply_rule_scn(rule):
-    
+    #sys.path.append("repoBuilder")
+    import repoBuilder.SCnML2SC.SCnML2SC as SCnML2SC
     output = os.path.join(defines.PATH_REPO_SRC, rule[2])
     if os.path.isdir(output):
         shutil.rmtree(output)
     os.mkdir(output)
     
-    SCnML2SC.download(rule[0],
-                    rule[1],
-                    os.path.join(defines.PATH_REPO_SRC, rule[2]))
+    SCnML2SC.download(kb_seg = rule[0],
+                    scn_seg = rule[1],
+                    _wikiUrl = rule[3],
+                    _category = rule[4],
+                    outDir = os.path.join(defines.PATH_REPO_SRC, rule[2]))
                     
 def apply_rule_new(rule):
     
@@ -186,10 +210,31 @@ def build(rules_file):
 #    print "#" * 25
 #    print "# Building repository"
 #    print "#" * 25
+    from repoBuilder.builder import Builder
     builder = Builder()
     builder.run()
     
 if __name__ == '__main__':
-    os.chdir("repoBuilder")
+    #os.chdir("repoBuilder")
+   
+    from optparse import OptionParser
+
+    parser = OptionParser()
+    parser.add_option("--bin", dest = "bin",
+                      help = "use specified binary path",
+                      metavar = "BIN", default = 'repoBuilder')
+    parser.add_option("--fs_repo_src", dest = "fs_repo_src",
+                      help = "use specified path for fs_repo_src",
+                      metavar = "FS_REPO_SRC", default = '../fs_repo_src')
+    parser.add_option("--fs_repo", dest = "fs_repo",
+                      help = "use specified path for fs_repo",
+                      metavar = "FS_REPO", default = '../fs_repo')                       
+    (options, args) = parser.parse_args()
+    
+    defines.PATH_REPO_SRC = options.fs_repo_src
+    defines.PATH_REPO_BIN = options.fs_repo
+    defines.INCLUDES = os.path.join(defines.PATH_REPO_SRC, "include")
+    
+    os.chdir(options.bin)
     rules_file = "build.rules"
     build(rules_file)

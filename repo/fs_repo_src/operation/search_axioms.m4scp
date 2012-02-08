@@ -1,0 +1,186 @@
+/*
+-----------------------------------------------------------------------------
+This source file is part of OSTIS (Open Semantic Technology for Intelligent Systems)
+For the latest info, see http://www.ostis.net
+
+Copyright (c) 2010 OSTIS
+
+OSTIS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OSTIS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
+-----------------------------------------------------------------------------
+*/
+
+//------------------------------------------------------------------------------
+//         File: search_axioms.m4scp
+//  Description: File contains operation for axiom search of indicated subject
+//               sphere.
+//------------------------------------------------------------------------------
+//       Author: Ivan Kosik
+//         Date: 31.01.12
+
+#include "scp_keynodes.scsy"
+#include "etc_questions.scsy"
+//~ Убрать лишние инклюды
+#include "com_keynodes.scsy"
+#include "_keynodes.scsy"
+#include "lib_search.scsy"
+#include "lib_set.scsy"
+#include "lib_answer.scsy"
+///////////////////////////////////////////////////////////////Program Beginning
+// Program that initialize operation:
+program(init_op,
+[[
+	q_initiated;
+	run_op;
+	catch_output_arc;
+]],
+[{
+}]
+)
+
+printNl([ 1_: fixed_: /"\nTest: search_axioms: program: init_op: point 1.1\n"/ ])
+
+// Subscribe to handle output arcs from "initiated question" node:
+sys_set_event_handler([
+	1_: fixed_: catch_output_arc,
+	2_: fixed_: run_op,
+	3_: fixed_: { 1_: q_initiated }
+])
+
+printNl([ 1_: fixed_: /"\nTest: search_axioms: program: init_op: point 1.2\n"/ ])
+
+return()
+end
+/////////////////////////////////////////////////////////////////////Program End
+/////////////////////////////////////////////////////////////Procedure Beginning
+// Procedure that process question and make answer:
+procedure(run_op,
+[[
+	q_search_axioms;
+	set_rm_el;
+	search_axioms;
+	search_base_cycle; //~
+]],
+[{
+	// Input parameters:
+	descr, element, arc, question_node, //~ descr, element, arc ?
+	// Other variables:
+	segment, arc2, result, descr2
+}],
+{[
+	1_: in_: descr,
+	2_: in_: element,
+	3_: in_: arc,
+	4_: in_: question_node
+]}
+)
+
+printNl([ 1_: fixed_: /"\nTest: search_axioms: procedure: run_op: point 2.1\n"/ ])
+
+// Need to set segment that contains question node as default to generate answer
+// in it:
+sys_get_location([ 1_: fixed_: question_node, 2_: assign_: segment ])
+sys_open_segment([ 1_: fixed_: segment ])
+sys_set_default_segment([ 1_: fixed_: segment ])
+
+searchElStr3([
+	1_:  fixed_: q_search_axioms,
+	2_: assign_: const_: pos_: arc_: arc2,
+	3_:  fixed_: question_node
+], , goto_end)
+
+// Call cycle to find axioms for all elements in a question:
+callReturn([
+	1_: fixed_: search_base_cycle,
+	2_: fixed_: {[
+		1_: question_node,
+		2_: search_axioms,
+		3_: result
+	]}
+], , , , goto_error) //~ descr2
+
+// Remove question node from result:
+callReturn([
+	1_: fixed_: set_rm_el,
+	2_: fixed_: {[
+		1_: result,
+		2_: question_node
+	]}
+], , , , goto_error) //~ descr2
+
+// Make answer:
+callReturn([
+	1_: fixed_: answer_make,
+	2_: fixed_: {[
+		1_: question_node,
+		2_: result
+	]}
+], , , , goto_error) //~ descr2
+
+printNl([ 1_: fixed_: /"\nTest: search_axioms: procedure: run_op: point 2.2: result:\n"/ ])
+printEl([ 1_: fixed_: result ])
+return()
+
+label(goto_error)
+printNl([ 1_: fixed_: /"\nTest: search_axioms: procedure: run_op: point 2.3: RUNTIME ERROR\n"/ ])
+
+label(goto_end)
+return()
+end
+///////////////////////////////////////////////////////////////////Procedure End
+/////////////////////////////////////////////////////////////Procedure Beginning
+// Procedure that search for axioms:
+procedure(search_axioms,
+[[
+	axiom = "/etc/com_keynodes/аксиома_";
+]],
+[{
+	// Parameters:
+	question_node,
+	result_set,
+	// Other variables:
+	arc2, node3, arc4
+}],
+{[
+	1_: in_: question_node,
+	2_: in_: out_: result_set
+]}
+)
+
+
+//~ Убран атрибут node_:
+searchSetStr5([
+	1_:  fixed_: question_node,
+	2_: assign_: arc_: pos_: const_: arc2,
+	3_: assign_: const_: node3,
+	4_: assign_: arc_: pos_: const_: arc4,
+	5_:  fixed_: rrel_axiom,
+	set2_: set3_: set4_: fixed_: result_set
+], , goto_end, goto_end)
+
+genElStr3([
+	1_:  fixed_: result_set,
+	2_: assign_: arc_: pos_: const_: arc2,
+	3_:  fixed_: question_node
+])
+genElStr3([
+	1_:  fixed_: result_set,
+	2_: assign_: arc_: pos_: const_: arc2,
+	3_:  fixed_: rrel_axiom
+])
+
+
+label(goto_end)
+return()
+end
+///////////////////////////////////////////////////////////////////Procedure End

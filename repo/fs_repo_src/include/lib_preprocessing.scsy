@@ -22,3 +22,4 @@ along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
 
 fragment_all_impl_conclusions = "/lib/preprocessing/fragment_all_impl_conclusions/fragment_all_impl_conclusions";
 gen_all_transitive_accessories = "/lib/preprocessing/gen_all_transitive_accessories/gen_all_transitive_accessories";
+merge_statements_about_class = "/lib/preprocessing/merge_statements_about_class/merge_statements_about_class";

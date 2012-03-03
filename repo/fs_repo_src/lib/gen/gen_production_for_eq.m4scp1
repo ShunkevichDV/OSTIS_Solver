@@ -101,6 +101,11 @@ genElStr3([
 	2_: assign_: const_: pos_: arc,
 	3_: fixed_: value
 ])
+callReturn([1_: fixed_: enable_arifmetic_processor,
+		2_: fixed_:
+		{[
+		]}
+])
 callReturn([
 	1_: fixed_: gen_checking_atomic_statement_validity_request,
 	2_: fixed_:
@@ -121,7 +126,6 @@ sys_search([
 ],right_good,right_wrong)
 
 label(right_good)
-
 sys_search([
 	1_: fixed_: left,
 	4_: assign_: res_set2
@@ -172,7 +176,6 @@ ifVarAssign([1_: stat],gen_request,gen_bad_result)
 
 //#],gen_request,gen_request)
 label(right_wrong)
-
 genElStr3([
 	1_: assign_: const_: node_: temp,
 	2_: assign_: const_: pos_: arc,
@@ -269,11 +272,6 @@ genElStr3([
 	2_: assign_: const_: pos_: arc,
 	3_: fixed_: res
 ],,exit)
-callReturn([1_: fixed_: enable_arifmetic_processor,
-		2_: fixed_:
-		{[
-		]}
-])
 genElStr3([
 	1_: fixed_: q_initiated,
 	2_: assign_: const_: pos_: arc,

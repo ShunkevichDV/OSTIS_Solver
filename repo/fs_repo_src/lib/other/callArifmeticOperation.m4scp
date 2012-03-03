@@ -54,7 +54,7 @@ procedure(run,
 ]],
 [{
 	q_arifmetic, arcVar, questionNode, arifmeticLink,
-	isSuccess, arc, attributeArc
+	isSuccess, arc, attributeArc, temp
 }],
 {[
 	1_: in_: q_arifmetic, 
@@ -77,6 +77,23 @@ genElStr3([
 	2_: assign_: arc_: const_: pos_: actual_: arcVar,
 	3_: fixed_: arifmeticLink
 ])
+
+searchElStr5([
+		1_: fixed_: arifmeticLink,
+		2_: assign_: arc,
+		3_: assign_: temp,
+		4_: assign_: attributeArc,
+		5_: fixed_: 1_
+	])
+ifVarAssign([1_: temp],,noprint)
+	
+//#printNl([
+//#	1_: fixed_: /"ARIFMETIC LINK"/
+//#])
+//#printEl([
+//#	1_: fixed_: temp
+//#])
+label(noprint)
 		
 // Проводим дугу из узла "вопрос"
 genElStr3([

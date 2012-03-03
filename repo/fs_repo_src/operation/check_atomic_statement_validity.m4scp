@@ -97,6 +97,7 @@ procedure(check_atomic_statement_validity,
 		group_arifmetic_relation ->> _relation;
 	];
 	
+	
 	// Шаблон для поиска арифметических отношений без атрибутов
 	arifmetic_relation_pattern_without_attributes = [
 		__arc = (_relation ->>> __link);
@@ -204,8 +205,6 @@ sys_search([
 		{ 1_: _contour, 2_: statementCopy }
 	}
 ], , arifmeticRelationsWithoutAtrributesDeletion)
-
-nop(successResult)
 
 // Удаляем связки арифметических отношений из высказывания
 callReturn([
@@ -457,13 +456,7 @@ label(noArifmeticLinks)
 			1_: fixed_: arcVar
 		])
 		
-		//#printNl([1_: /"ELEMENT"/])
-		//#callReturn([
-//#			1_: fixed_: print_sys_search,
-//#			2_: fixed_: {[
-//#				1_: fixed_: currentCorrespondence
-//#			]}
-		//#])	
+		
 		
 		callReturn([
 			1_: fixed_: set_cantorize,
@@ -472,6 +465,37 @@ label(noArifmeticLinks)
 				2_: assign_: statement1
 			]}
 		])
+		
+		// ========================================УДАЛИТЬ ИЛИ ЗАКОММЕНТИТЬ
+		
+		printNl([
+			1_: fixed_: /"CHECK SYS_GEN"/
+		])
+		
+		// По шаблону находим все связки арифметических отношений в формуле
+		sys_search([
+			1_: fixed_: arifmetic_relation_pattern,
+			2_: fixed_: {
+				{ 1_: __link, 2_: assign_: set_: tempNode }
+			},
+			3_: fixed_: {
+				{ 1_: _contour, 2_: statement1 }
+			}
+		])
+		
+		ifVarAssign([
+			1_: tempNode
+		], , noPrint)
+
+		callReturn([
+			1_: fixed_: print_sys_search,
+			2_: fixed_: {[
+				1_: fixed_: tempNode
+			]}
+		])
+		// ==================================================================
+		
+		label(noPrint)
 		
 		// Генерируем формулу для расчета
 		sys_gen([
@@ -485,6 +509,8 @@ callReturn([1_: fixed_: enable_arifmetic_processor,
 		{[
 		]}
 ])	
+
+		
 		// Инициируем операцию вычисления формулы
 		callReturn([
 			1_: fixed_: call_arifmetic_interpreter,

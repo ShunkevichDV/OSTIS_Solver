@@ -1,0 +1,92 @@
+//#sss
+#include "scp_keynodes.scsy"
+#include "com_keynodes.scsy"
+#include "etc_questions.scsy"
+#include "lib_gen.scsy"
+#include "lib_set.scsy"
+
+program(merge_statements_about_class,
+[[	
+	stat_pattern=[
+		nrel_statements_about_class->>_link;
+		_link={. 1_:: _stats, 2_:: _class.};
+	];
+]],
+[{
+	arc,del_arc,descr,temp,arc1,set,class,base_stat,
+	seg,segments,stats,classes,class_copy,stats,stat,link
+}],
+{[
+]}
+)
+printNl([1_: /"MERGING STATEMENTS..."/])
+
+sys_search([
+	1_: fixed_: stat_pattern,
+	2_: fixed_: { {1_: _class, 2_: set_: classes} }
+])
+
+callReturn([
+	1_: fixed_: set_cantorize,
+	2_: fixed_: {[
+		1_: fixed_: classes,
+		2_: assign_: classes
+	]}
+])
+
+label(next_class)
+searchElStr3([
+	1_: fixed_: classes,
+	2_: assign_: const_: pos_: del_arc,
+	3_: assign_: class
+],,exit)
+
+eraseEl([1_: fixed_: del_arc])
+
+ifVarAssign([1_: stats],,no_erase_stats)
+eraseEl([1_: fixed_: stats])
+label(no_erase_stats)
+
+sys_search([
+	1_: fixed_: stat_pattern,
+	2_: fixed_: { {1_: _stats, 2_: set_: stats} },
+	3_: fixed_: { {1_: _class, 2_: fixed_: class} }
+])
+//#printNl([1_: /"CURRENT CLASS:"/])
+//#printEl([1_: class])
+searchElStr3([
+	1_: fixed_: stats,
+	2_: assign_: const_: pos_: del_arc,
+	3_: assign_: base_stat
+],,next_class)
+eraseEl([1_: fixed_: del_arc])
+
+label(next_stats)
+searchElStr3([
+	1_: fixed_: stats,
+	2_: assign_: const_: pos_: del_arc,
+	3_: assign_: stat
+],,next_class)
+eraseEl([1_: fixed_: del_arc])
+sys_search([
+	1_: fixed_: stat_pattern,
+	2_: fixed_: { {1_: _link, 2_: assign_: link} },
+	3_: fixed_: { {1_: _class, 2_: fixed_: class}, {1_: _stats, 2_: fixed_: stat} }
+])
+eraseEl([1_: link])
+callReturn([
+	1_: fixed_: full_merge,
+	2_: fixed_: {[
+		1_: fixed_: stat,
+		2_: fixed_: base_stat
+	]}
+])
+nop(next_stats)
+
+label(exit)
+ifVarAssign([1_: classes],,no_erase_classes)
+eraseEl([1_: fixed_: classes])
+label(no_erase_classes)
+printNl([1_: /"MERGING STATEMENTS COMPLETED"/])
+return()
+end

@@ -181,8 +181,9 @@ searchElStr5([
 printNl([
 	1_: fixed_: /"I have entered CALCULATION"/
 ])
-//#printNl([1_: /"FORMULA"/])
-//#printEl([1_: formula])
+
+printNl([1_: /"FORMULA"/])
+printEl([1_: formula])
 
 // По шаблону находим все связки арифметических отношений в формуле
 sys_search([
@@ -194,6 +195,13 @@ sys_search([
 		{ 1_: _contour, 2_: formula }
 	}
 ], , noArifmeticLinks)
+
+		callReturn([
+			1_: fixed_: print_sys_search,
+			2_: fixed_: {[
+				1_: fixed_: arifmeticLinks
+			]}
+		])	
 
 // Создаем множество вершин, которые помечаются в процессе подсчета формулы
 genEl([
@@ -222,16 +230,23 @@ label(calculationNotSuccess)
 	label(deleteArcsFromOperationIsOver)
 
 		// Ищем дугу, которая выходит из атрибута "операция выполнилась_"
-		searchElStr3([
+		//#searchElStr3([
+//#			1_: fixed_: rrel_operation_is_over,
+			//#2_: assign_: arc_: const_: pos_: actual_: arcVar,
+			//#3_: assign_: arc_: const_: pos_: actual_: attributeArc
+		//#], , formulaView )
+		
+		eraseSetStr3([
 			1_: fixed_: rrel_operation_is_over,
-			2_: assign_: arc_: const_: pos_: actual_: arcVar,
+			2_: assign_: arc_: const_: pos_: actual_: f_: arcVar,
 			3_: assign_: arc_: const_: pos_: actual_: attributeArc
 		], , formulaView )
 
+		
 		// Удаляем найденную дугу
-		eraseEl([
-			1_: fixed_: arcVar
-		], deleteArcsFromOperationIsOver)
+		//#eraseEl([
+		//#	1_: fixed_: arcVar
+		//#], deleteArcsFromOperationIsOver)
 
 	// Просматриваем множество связок арифметических отношений формулы для подсчета целевой величины
 	label(formulaView)
@@ -242,7 +257,7 @@ label(calculationNotSuccess)
 			2_: assign_: arc_: const_: pos_: actual_: arcVar,
 			3_: assign_: node_: const_: nodeVar
 		], , checkResult)
-
+		
 		// Удаляем дугу к очередному узлу
 		eraseEl([
 			1_: fixed_: f_: arcVar

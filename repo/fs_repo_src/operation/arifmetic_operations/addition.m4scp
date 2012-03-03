@@ -272,6 +272,9 @@ label(additionOperation)
 	// Просматриваем узлы, являющиеся слагаемыми
 	label(summandsView)
 
+		printNl([1_: /"LINKCOPY"/])
+		printEl([1_: summandsLinkCopy])
+	
 		// Находим очередное слагаемое из суммы
 		searchElStr3([
 			1_: fixed_: summandsLinkCopy,
@@ -316,6 +319,10 @@ label(additionOperation)
 			1_: fixed_: currentSummand
 		], , cleanCopiesAfterAddition)
 
+		printNl([1_: /"SUMMNODE"/])
+		printNl([1_: sumAccumulationNode])
+		printNl([1_: currentSummand])
+		
 		// Добавляем текущее слагаемое в сумму
 		add([
 			1_: fixed_: sumAccumulationNode,

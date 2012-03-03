@@ -7,7 +7,7 @@
 
 program(temp3,
 [[	
-	link="/seb/planimetry/STAT";
+	link="/seb/planimetry/ATOM_STAT";
 	here=/"\n\nTEMP3 ended!\n\n"/;
 	contur="/seb/planimetry/CONTUR";
 ]],
